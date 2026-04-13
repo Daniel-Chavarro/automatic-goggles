@@ -29,34 +29,48 @@ import java.math.BigInteger;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class ProductEntity extends AuditableEntity{
-    /** Technical identifier of the product. */
+public class ProductEntity extends AuditableEntity {
+    /**
+     * Technical identifier of the product.
+     */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "product_id", nullable = false, unique = true)
     private Long id;
 
-    /** Display name of the product. */
-    @Column(name="name", nullable = false)
+    /**
+     * Display name of the product.
+     */
+    @Column(name = "name", nullable = false)
     private String name;
 
-    /** Optional description for commercial detail. */
+    /**
+     * Optional description for commercial detail.
+     */
     @Column(name = "description")
     private String description;
 
-    /** Current catalog price of the product. */
+    /**
+     * Current catalog price of the product.
+     */
     @Column(name = "price", precision = 10, scale = 2)
     private BigDecimal price;
 
-    /** Available stock for new orders. */
+    /**
+     * Available stock for new orders.
+     */
     @Column(name = "stock_quantity")
     private int stockQuantity;
 
-    /** Logical flag to enable or disable the product. */
+    /**
+     * Logical flag to enable or disable the product.
+     */
     @Column(name = "active")
     private boolean active;
 
-    /** Version used for optimistic concurrency control. */
+    /**
+     * Version used for optimistic concurrency control.
+     */
     @Version
     @Column(name = "version")
     private BigInteger version;

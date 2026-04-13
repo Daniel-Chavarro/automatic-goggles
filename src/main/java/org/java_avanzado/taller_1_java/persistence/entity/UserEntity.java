@@ -32,38 +32,54 @@ import java.util.UUID;
 @Builder
 public class UserEntity extends AuditableEntity {
 
-    /** Unique technical identifier of the user. */
+    /**
+     * Unique technical identifier of the user.
+     */
     @Id
     @Column(name = "user_id", nullable = false, unique = true)
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    /** User first name. */
-    @Column(name="first_name", nullable = false)
+    /**
+     * User first name.
+     */
+    @Column(name = "first_name", nullable = false)
     private String firstName;
 
-    /** User last name. */
-    @Column(name="last_name", nullable = false)
+    /**
+     * User last name.
+     */
+    @Column(name = "last_name", nullable = false)
     private String lastName;
 
-    /** Primary email, unique within the system. */
-    @Column(name="email", nullable = false, unique = true)
+    /**
+     * Primary email, unique within the system.
+     */
+    @Column(name = "email", nullable = false, unique = true)
     private String email;
 
-    /** Optional contact phone number. */
-    @Column(name="phone")
+    /**
+     * Optional contact phone number.
+     */
+    @Column(name = "phone")
     private String phone;
 
-    /** Persisted hash or credential used for authentication. */
-    @Column(name="password", nullable = false)
+    /**
+     * Persisted hash or credential used for authentication.
+     */
+    @Column(name = "password", nullable = false)
     private String password;
 
-    /** Role that defines permissions and functional scope. */
+    /**
+     * Role that defines permissions and functional scope.
+     */
     @Enumerated(EnumType.STRING)
-    @Column(name="role", nullable = false)
+    @Column(name = "role", nullable = false)
     private UserRole role;
 
-    /** Logical activation status of the account. */
+    /**
+     * Logical activation status of the account.
+     */
     @Column(name = "active", nullable = false)
     private boolean active;
 }

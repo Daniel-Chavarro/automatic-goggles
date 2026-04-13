@@ -30,26 +30,36 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @Builder
 public class OrderProductEntity {
-    /** Technical identifier of the order item. */
+    /**
+     * Technical identifier of the order item.
+     */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    /** Order that owns this item. */
+    /**
+     * Order that owns this item.
+     */
     @ManyToOne
     @JoinColumn(name = "order_id", nullable = false)
     private OrderEntity order;
 
-    /** Product associated with this order item. */
+    /**
+     * Product associated with this order item.
+     */
     @ManyToOne
     @JoinColumn(name = "product_id", nullable = false)
     private ProductEntity product;
 
-    /** Requested quantity for the product in the order. */
+    /**
+     * Requested quantity for the product in the order.
+     */
     @Column(name = "quantity", nullable = false)
     private Integer quantity;
 
-    /** Unit price frozen at the time the order is created. */
+    /**
+     * Unit price frozen at the time the order is created.
+     */
     @Column(name = "unit_price", nullable = false, precision = 10, scale = 2)
     private BigDecimal unitPrice;
 }
