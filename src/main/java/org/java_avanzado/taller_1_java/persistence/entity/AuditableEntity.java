@@ -24,22 +24,30 @@ import java.time.Instant;
 @EntityListeners(AuditingEntityListener.class)
 public class AuditableEntity {
 
-    /** Timestamp when the record was created. */
+    /**
+     * Timestamp when the record was created.
+     */
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
 
-    /** Timestamp of the last record update. */
+    /**
+     * Timestamp of the last record update.
+     */
     @LastModifiedDate
     @Column(name = "updated_at")
     private Instant updatedAt;
 
-    /** Identifier of the actor who created the record. */
+    /**
+     * Identifier of the actor who created the record.
+     */
     @CreatedBy
     @Column(name = "created_by", nullable = false, updatable = false)
     private String createdBy;
 
-    /** Identifier of the actor who made the last update. */
+    /**
+     * Identifier of the actor who made the last update.
+     */
     @LastModifiedBy
     @Column(name = "updated_by")
     private String updatedBy;
