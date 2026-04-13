@@ -1,0 +1,34 @@
+package org.java_avanzado.taller_1_java.config;
+
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+
+import java.util.concurrent.Executor;
+import java.util.concurrent.ThreadPoolExecutor;
+
+@Configuration
+@Slf4j
+@EnableAsync
+public class AsyncConfiguration {
+    /**
+     * Defines a TaskExecutor bean with a thread pool configured based on available processors.
+     */
+    @Bean(name = "taskExecutor")
+    public Executor taskExecutor() {
+        int corePoolSize = Runtime.getRuntime().availableProcessors();
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(corePoolSize);
+        executor.setMaxPoolSize(corePoolSize * 2);
+        executor.setQueueCapacity(corePoolSize * 10);
+        executor.setThreadNamePrefix("Tasks-Async-");
+        executor.setWaitForTasksToCompleteOnShutdown(true);
+        executor.setAwaitTerminationSeconds(60);
+        executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
+        executor.initialize();
+        return executor;
+    }
+
+}
