@@ -9,12 +9,17 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ThreadPoolExecutor;
 
+/**
+ * Configures asynchronous task execution for the application.
+ */
 @Configuration
 @Slf4j
 @EnableAsync
 public class AsyncConfiguration {
     /**
-     * Defines a TaskExecutor bean with a thread pool configured based on available processors.
+     * Creates the shared asynchronous {@link Executor} used by Spring {@code @Async} methods.
+     *
+     * @return a configured thread-pool-based task executor
      */
     @Bean(name = "taskExecutor")
     public Executor taskExecutor() {
