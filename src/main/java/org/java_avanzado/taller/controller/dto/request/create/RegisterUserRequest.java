@@ -17,14 +17,14 @@ public class RegisterUserRequest {
      * User's given name.
      */
     @NotNull
-    @Max(value = 100, message = "First name cannot be more than 100 characters")
+    @Size(max = 100, message = "First name cannot be more than 100 characters")
     private String firstName;
 
     /**
      * User's family name.
      */
     @NotNull
-    @Max(value = 100, message = "Last name cannot be more than 100 characters")
+    @Size(max = 100, message = "Last name cannot be more than 100 characters")
     private String lastName;
 
     /**
@@ -32,7 +32,7 @@ public class RegisterUserRequest {
      */
     @NotNull
     @Email
-    @Max(value = 320, message = "Email cannot be more than 100 characters")
+    @Size(max = 320, message = "Email cannot be more than 100 characters")
     private String email;
 
     /**
