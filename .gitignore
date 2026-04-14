@@ -31,3 +31,9 @@ build/
 
 ### VS Code ###
 .vscode/
+
+## Agents and AI tools ###
+CLAUDE.md
+/.agents/
+/.claude/
+skills-lock.json
