@@ -1,4 +1,4 @@
-package org.java_avanzado.taller_1_java;
+package org.java_avanzado.taller;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

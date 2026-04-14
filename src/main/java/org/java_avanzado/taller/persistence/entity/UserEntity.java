@@ -1,4 +1,4 @@
-package org.java_avanzado.taller_1_java.persistence.entity;
+package org.java_avanzado.taller.persistence.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -13,7 +13,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.java_avanzado.taller_1_java.domain.model.UserRole;
+import org.java_avanzado.taller.domain.model.UserRole;
 
 import java.util.UUID;
 

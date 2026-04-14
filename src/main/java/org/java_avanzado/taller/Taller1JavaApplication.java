@@ -1,4 +1,4 @@
-package org.java_avanzado.taller_1_java;
+package org.java_avanzado.taller;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

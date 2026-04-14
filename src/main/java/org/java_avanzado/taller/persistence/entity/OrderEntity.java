@@ -1,4 +1,4 @@
-package org.java_avanzado.taller_1_java.persistence.entity;
+package org.java_avanzado.taller.persistence.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -6,7 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.java_avanzado.taller_1_java.domain.model.OrderStatus;
+import org.java_avanzado.taller.domain.model.OrderStatus;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;

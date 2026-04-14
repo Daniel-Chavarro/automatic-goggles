@@ -1,6 +1,6 @@
-package org.java_avanzado.taller_1_java.persistence.repository;
+package org.java_avanzado.taller.persistence.repository;
 
-import org.java_avanzado.taller_1_java.persistence.entity.UserEntity;
+import org.java_avanzado.taller.persistence.entity.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

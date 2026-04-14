@@ -1,4 +1,4 @@
-package org.java_avanzado.taller_1_java.domain.model;
+package org.java_avanzado.taller.domain.model;
 
 import lombok.Builder;
 import lombok.Data;
