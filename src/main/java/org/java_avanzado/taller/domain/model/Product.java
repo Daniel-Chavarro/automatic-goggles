@@ -1,5 +1,7 @@
 package org.java_avanzado.taller.domain.model;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Positive;
 import lombok.Builder;
 import lombok.Data;
 
@@ -21,6 +23,7 @@ public class Product {
     /**
      * Display name of the product.
      */
+    @NotBlank
     private String name;
 
     /**
@@ -31,11 +34,13 @@ public class Product {
     /**
      * Current sale price for one unit.
      */
+    @Positive
     private BigDecimal price;
 
     /**
      * Quantity available in stock.
      */
+    @Positive
     private int quantity;
 
     /**

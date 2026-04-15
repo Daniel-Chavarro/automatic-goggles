@@ -1,5 +1,7 @@
 package org.java_avanzado.taller.service;
 
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.java_avanzado.taller.domain.exception.ProductNotFoundException;
 import org.java_avanzado.taller.domain.model.Product;
@@ -49,10 +51,10 @@ public class ProductService {
     }
 
     @Transactional(readOnly = true)
-    public java.util.List<Product> getAllActiveProducts() {
+    public List<Product> getAllActiveProducts() {
         return productRepository.findAll().stream()
                 .filter(ProductEntity::isActive)
                 .map(productMapper::toDomain)
-                .collect(java.util.stream.Collectors.toList());
+                .collect(Collectors.toList());
     }
 }
