@@ -51,7 +51,7 @@ public class OrderEntity extends AuditableEntity {
      */
     @Version
     @Column(name = "version", nullable = false)
-    private BigInteger version;
+    private Long version;
 
     /**
      * Order items with full cascade and orphan removal.

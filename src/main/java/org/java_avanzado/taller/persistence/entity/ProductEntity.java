@@ -73,5 +73,5 @@ public class ProductEntity extends AuditableEntity {
      */
     @Version
     @Column(name = "version")
-    private BigInteger version;
+    private Long version;
 }
