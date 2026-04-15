@@ -3,6 +3,7 @@ package org.java_avanzado.taller.domain.model;
 import lombok.Builder;
 import lombok.Data;
 
+import org.java_avanzado.taller.domain.exception.InsufficientStockException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
@@ -49,7 +50,7 @@ public class Product {
 
     public void deductStock(int amount) {
         if (this.quantity < amount) {
-            throw new org.java_avanzado.taller.domain.exception.InsufficientStockException("Not enough stock for product: " + this.name);
+            throw new InsufficientStockException("Not enough stock for product: " + this.name);
         }
         this.quantity -= amount;
     }
