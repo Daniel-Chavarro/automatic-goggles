@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 
 /**
  * Domain model representing a catalog product.
@@ -40,4 +41,16 @@ public class Product {
      * Indicates whether the product is active and available.
      */
     private boolean active;
+
+    /**
+     * Optimistic locking version.
+     */
+    private BigInteger version;
+
+    public void deductStock(int amount) {
+        if (this.quantity < amount) {
+            throw new org.java_avanzado.taller.domain.exception.InsufficientStockException("Not enough stock for product: " + this.name);
+        }
+        this.quantity -= amount;
+    }
 }
