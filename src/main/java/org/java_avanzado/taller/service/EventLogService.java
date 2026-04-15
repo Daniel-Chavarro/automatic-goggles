@@ -1,6 +1,7 @@
 package org.java_avanzado.taller.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf;
 import org.java_avanzado.taller.persistence.entity.EventLogEntity;
 import org.java_avanzado.taller.persistence.repository.EventLogRepository;
 import org.springframework.scheduling.annotation.Async;
@@ -11,19 +12,24 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class EventLogService {
 
     private final EventLogRepository eventLogRepository;
 
     @Async
     public void logEvent(String eventType, String details, String username) {
-        EventLogEntity log = EventLogEntity.builder()
-                .eventType(eventType)
-                .details(details)
-                .username(username)
-                .timestamp(LocalDateTime.now())
-                .build();
-        eventLogRepository.save(log);
+        try {
+            EventLogEntity log = EventLogEntity.builder()
+                    .eventType(eventType)
+                    .details(details)
+                    .username(username)
+                    .timestamp(LocalDateTime.now())
+                    .build();
+            eventLogRepository.save(log);
+        } catch (Exception e) {
+            log.error("Failed to log event: {}", e.getMessage(), e);
+        }
     }
 
     public List<EventLogEntity> getAllLogs() {
