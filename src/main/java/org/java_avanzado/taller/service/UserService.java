@@ -2,6 +2,8 @@ package org.java_avanzado.taller.service;
 
 import lombok.RequiredArgsConstructor;
 import org.java_avanzado.taller.config.JwtService;
+import org.java_avanzado.taller.domain.exception.EmailAlreadyExistsException;
+import org.java_avanzado.taller.domain.exception.UserNotFoundException;
 import org.java_avanzado.taller.domain.model.User;
 import org.java_avanzado.taller.domain.model.UserRole;
 import org.java_avanzado.taller.persistence.entity.UserEntity;
@@ -25,8 +27,14 @@ public class UserService {
 
     @Transactional
     public String registerUser(User user) {
+        if (user.getEmail() == null || user.getEmail().isBlank()) {
+            throw new IllegalArgumentException("Email is required");
+        }
+        if (user.getPassword() == null || user.getPassword().isBlank()) {
+            throw new IllegalArgumentException("Password is required");
+        }
         if (userRepository.findByEmail(user.getEmail()).isPresent()) {
-            throw new RuntimeException("Email already in use");
+            throw new EmailAlreadyExistsException("Email already in use");
         }
         UserEntity entity = userMapper.toEntity(user);
         entity.setPassword(passwordEncoder.encode(user.getPassword()));
@@ -40,21 +48,23 @@ public class UserService {
 
     public String authenticate(String email, String password) {
         UserEntity user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Invalid credentials"));
+                .orElseThrow(() -> new IllegalArgumentException("Invalid credentials"));
         if (!passwordEncoder.matches(password, user.getPassword())) {
-            throw new RuntimeException("Invalid credentials");
+            throw new IllegalArgumentException("Invalid credentials");
         }
         if (!user.isActive()) {
-            throw new RuntimeException("Account disabled");
+            throw new IllegalArgumentException("Account disabled");
         }
         return jwtService.generateToken(email);
     }
 
+    @Transactional(readOnly = true)
     public User getUserById(UUID id) {
         return userRepository.findById(id).map(userMapper::toDomain)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
     }
 
+    @Transactional(readOnly = true)
     public List<User> getAllUsers() {
         return userRepository.findAll().stream()
                 .map(userMapper::toDomain)
@@ -64,7 +74,7 @@ public class UserService {
     @Transactional
     public void disableUser(UUID id) {
         UserEntity entity = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
         entity.setActive(false);
         userRepository.save(entity);
     }
