@@ -10,16 +10,10 @@ public enum UserRole {
     /**
      * Standard customer role with regular application permissions.
      */
-    CLIENT("CLIENT"),
+    CLIENT,
 
     /**
      * Administrative role with elevated permissions.
      */
-    ADMIN("ADMIN");
-
-    private final String value;
-
-    UserRole(String value) {
-        this.value = value;
-    }
+    ADMIN
 }
