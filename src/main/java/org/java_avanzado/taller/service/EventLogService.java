@@ -1,7 +1,7 @@
 package org.java_avanzado.taller.service;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf;
+import lombok.extern.slf4j.Slf4j;
 import org.java_avanzado.taller.persistence.entity.EventLogEntity;
 import org.java_avanzado.taller.persistence.repository.EventLogRepository;
 import org.springframework.scheduling.annotation.Async;
