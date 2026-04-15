@@ -27,6 +27,9 @@ public class UserService {
 
     @Transactional
     public String registerUser(User user) {
+        if (user == null) {
+            throw new IllegalArgumentException("User is required");
+        }
         if (user.getEmail() == null || user.getEmail().isBlank()) {
             throw new IllegalArgumentException("Email is required");
         }
@@ -46,6 +49,7 @@ public class UserService {
         return jwtService.generateToken(entity.getEmail());
     }
 
+    @Transactional(readOnly = true)
     public String authenticate(String email, String password) {
         UserEntity user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid credentials"));
