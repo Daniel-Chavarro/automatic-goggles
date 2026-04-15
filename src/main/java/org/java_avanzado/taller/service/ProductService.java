@@ -1,6 +1,7 @@
 package org.java_avanzado.taller.service;
 
 import lombok.RequiredArgsConstructor;
+import org.java_avanzado.taller.domain.exception.ProductNotFoundException;
 import org.java_avanzado.taller.domain.model.Product;
 import org.java_avanzado.taller.persistence.entity.ProductEntity;
 import org.java_avanzado.taller.persistence.repository.ProductRepository;
@@ -17,7 +18,7 @@ public class ProductService {
     @Transactional(readOnly = true)
     public Product getActiveProduct(Long id) {
         ProductEntity entity = productRepository.findByIdAndActiveTrue(id)
-                .orElseThrow(() -> new org.java_avanzado.taller.domain.exception.ProductNotFoundException("Product not found or disabled"));
+                .orElseThrow(() -> new ProductNotFoundException("Product not found or disabled"));
         return productMapper.toDomain(entity);
     }
 }
