@@ -22,7 +22,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class OrderService {
     private final OrderRepository orderRepository;
-    private final ProductService productService;
     private final ProductRepository productRepository;
     private final OrderMapper orderMapper;
 
@@ -31,13 +30,30 @@ public class OrderService {
         BigDecimal total = BigDecimal.ZERO;
 
         for (OrderProduct item : items) {
-            Product product = productService.getActiveProduct(Long.parseLong(item.getProductId()));
+            long productId;
+            try {
+                productId = Long.parseLong(item.getProductId());
+            } catch (NumberFormatException e) {
+                throw new IllegalArgumentException("Invalid product ID: " + item.getProductId());
+            }
+
+            ProductEntity pEntity = productRepository.findByIdAndActiveTrue(productId)
+                    .orElseThrow(() -> new IllegalArgumentException("Product not found or disabled"));
+
+            Product product = Product.builder()
+                    .id(pEntity.getId())
+                    .name(pEntity.getName())
+                    .description(pEntity.getDescription())
+                    .price(pEntity.getPrice())
+                    .quantity(pEntity.getStockQuantity())
+                    .active(pEntity.isActive())
+                    .build();
+
             product.deductStock(item.getQuantity());
 
             item.setUnitPrice(product.getPrice());
             total = total.add(product.getPrice().multiply(BigDecimal.valueOf(item.getQuantity())));
 
-            ProductEntity pEntity = productRepository.findById(product.getId()).orElseThrow();
             pEntity.setStockQuantity(product.getQuantity());
             productRepository.save(pEntity);
         }
