@@ -1,13 +1,11 @@
 package org.java_avanzado.taller.domain.model;
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 /**
  * Defines authorization roles available for system users.
  */
 @Getter
-@RequiredArgsConstructor
 public enum UserRole {
     /**
      * Standard customer role with regular application permissions.
@@ -20,4 +18,8 @@ public enum UserRole {
     ADMIN("ADMIN");
 
     private final String value;
+
+    UserRole(String value) {
+        this.value = value;
+    }
 }

@@ -1,12 +1,10 @@
 package org.java_avanzado.taller.domain.model;
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 /**
  * Defines the lifecycle states available for an order.
  */
-@RequiredArgsConstructor
 @Getter
 public enum OrderStatus {
     /**
@@ -25,4 +23,8 @@ public enum OrderStatus {
     REJECTED("REJECTED");
 
     private final String value;
+
+    OrderStatus(String value) {
+        this.value = value;
+    }
 }
