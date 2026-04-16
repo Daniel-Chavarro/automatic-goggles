@@ -9,5 +9,5 @@ import org.java_avanzado.taller.domain.model.UserRole;
 @Data
 public class CreateUserRequest extends RegisterUserRequest{
     @NotNull
-    private UserRole  role;
+    private UserRole role;
 }

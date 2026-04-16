@@ -21,9 +21,10 @@ public class OrderResponseMapper {
     }
     
     public OrderItemResponse itemToResponse(OrderProduct item) {
-        String productName = productService.getActiveProduct(item.getProductId()).getName();
+        Long productId = Long.parseLong(item.getProductId());
+        String productName = productService.getActiveProduct(productId).getName();
         return OrderItemResponse.builder()
-                .productId(item.getProductId())
+                .productId(productId)
                 .productName(productName)
                 .quantity(item.getQuantity())
                 .unitPrice(item.getUnitPrice())

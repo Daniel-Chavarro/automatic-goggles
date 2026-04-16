@@ -47,7 +47,7 @@ public class OrderService {
             product.deductStock(item.getQuantity());
 
             OrderProduct orderProduct = OrderProduct.builder()
-                    .productId(item.getProductId())
+                    .productId(String.valueOf(item.getProductId()))
                     .quantity(item.getQuantity())
                     .unitPrice(product.getPrice())
                     .build();
@@ -63,7 +63,7 @@ public class OrderService {
                     ProductEntity pEntity = productRepository.findByIdAndActiveTrue(item.getProductId())
                             .orElseThrow(() -> new IllegalArgumentException("Product not found or disabled"));
                     return OrderProduct.builder()
-                            .productId(item.getProductId())
+                            .productId(String.valueOf(item.getProductId()))
                             .quantity(item.getQuantity())
                             .unitPrice(pEntity.getPrice())
                             .build();
