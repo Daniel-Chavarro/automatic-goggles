@@ -1,9 +1,12 @@
 package org.java_avanzado.taller.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.java_avanzado.taller.domain.model.Order;
-import org.java_avanzado.taller.domain.model.OrderProduct;
+import org.java_avanzado.taller.controller.dto.request.create.CreateOrderRequest;
+import org.java_avanzado.taller.controller.dto.response.OrderResponse;
+import org.java_avanzado.taller.controller.dto.response.OrderSummaryResponse;
 import org.java_avanzado.taller.service.OrderService;
+import org.java_avanzado.taller.utils.mapper.OrderResponseMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,21 +21,22 @@ import java.util.UUID;
 public class OrderController {
 
     private final OrderService orderService;
+    private final OrderResponseMapper orderResponseMapper;
 
     @PostMapping("/user/{userId}")
-    public ResponseEntity<Order> createOrder(@PathVariable UUID userId, @RequestBody List<OrderProduct> items) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(orderService.createOrder(userId, items));
+    public ResponseEntity<OrderResponse> createOrder(@PathVariable UUID userId, @Valid @RequestBody CreateOrderRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(orderResponseMapper.toResponse(orderService.createOrder(userId, request)));
     }
 
     @Transactional(readOnly = true)
     @GetMapping("/user/{userId}")
-    public ResponseEntity<List<Order>> getUserOrders(@PathVariable UUID userId) {
-        return ResponseEntity.ok(orderService.getOrdersByUser(userId));
+    public ResponseEntity<List<OrderSummaryResponse>> getUserOrders(@PathVariable UUID userId) {
+        return ResponseEntity.ok(orderResponseMapper.toSummaryList(orderService.getOrdersByUser(userId)));
     }
 
     @Transactional(readOnly = true)
     @GetMapping
-    public ResponseEntity<List<Order>> getAllOrders() {
-        return ResponseEntity.ok(orderService.getAllOrders());
+    public ResponseEntity<List<OrderSummaryResponse>> getAllOrders() {
+        return ResponseEntity.ok(orderResponseMapper.toSummaryList(orderService.getAllOrders()));
     }
 }
