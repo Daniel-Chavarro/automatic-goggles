@@ -1,8 +1,13 @@
 package org.java_avanzado.taller.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.java_avanzado.taller.domain.model.User;
+import org.java_avanzado.taller.controller.dto.request.create.CreateUserRequest;
+import org.java_avanzado.taller.controller.dto.request.update.UpdateUserRequest;
+import org.java_avanzado.taller.controller.dto.response.UserResponse;
+import org.java_avanzado.taller.controller.dto.response.UserSummaryResponse;
 import org.java_avanzado.taller.service.UserService;
+import org.java_avanzado.taller.utils.mapper.UserResponseMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,15 +20,26 @@ import java.util.UUID;
 public class UserController {
 
     private final UserService userService;
+    private final UserResponseMapper userResponseMapper;
 
     @GetMapping
-    public ResponseEntity<List<User>> getAllUsers() {
-        return ResponseEntity.ok(userService.getAllUsers());
+    public ResponseEntity<List<UserSummaryResponse>> getAllUsers() {
+        return ResponseEntity.ok(userResponseMapper.toSummaryList(userService.getAllUsers()));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<User> getUserById(@PathVariable UUID id) {
-        return ResponseEntity.ok(userService.getUserById(id));
+    public ResponseEntity<UserResponse> getUserById(@PathVariable UUID id) {
+        return ResponseEntity.ok(userResponseMapper.toResponse(userService.getUserById(id)));
+    }
+
+    @PostMapping
+    public ResponseEntity<UserResponse> createUser(@Valid @RequestBody CreateUserRequest request) {
+        return ResponseEntity.ok(userResponseMapper.toResponse(userService.createUser(request)));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<UserResponse> updateUser(@PathVariable UUID id, @Valid @RequestBody UpdateUserRequest request) {
+        return ResponseEntity.ok(userResponseMapper.toResponse(userService.updateUser(id, request)));
     }
 
     @DeleteMapping("/{id}")
