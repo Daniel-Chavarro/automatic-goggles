@@ -1,6 +1,8 @@
 package org.java_avanzado.taller.service;
 
 import lombok.RequiredArgsConstructor;
+import org.java_avanzado.taller.controller.dto.request.create.AddOrderItemRequest;
+import org.java_avanzado.taller.controller.dto.request.create.CreateOrderRequest;
 import org.java_avanzado.taller.domain.model.Order;
 import org.java_avanzado.taller.domain.model.OrderProduct;
 import org.java_avanzado.taller.domain.model.OrderStatus;
@@ -26,18 +28,11 @@ public class OrderService {
     private final OrderMapper orderMapper;
 
     @Transactional
-    public Order createOrder(UUID userId, List<OrderProduct> items) {
+    public Order createOrder(UUID userId, CreateOrderRequest request) {
         BigDecimal total = BigDecimal.ZERO;
 
-        for (OrderProduct item : items) {
-            long productId;
-            try {
-                productId = Long.parseLong(item.getProductId());
-            } catch (NumberFormatException e) {
-                throw new IllegalArgumentException("Invalid product ID: " + item.getProductId());
-            }
-
-            ProductEntity pEntity = productRepository.findByIdAndActiveTrue(productId)
+        for (AddOrderItemRequest item : request.getItems()) {
+            ProductEntity pEntity = productRepository.findByIdAndActiveTrue(item.getProductId())
                     .orElseThrow(() -> new IllegalArgumentException("Product not found or disabled"));
 
             Product product = Product.builder()
@@ -51,18 +46,35 @@ public class OrderService {
 
             product.deductStock(item.getQuantity());
 
-            item.setUnitPrice(product.getPrice());
+            OrderProduct orderProduct = OrderProduct.builder()
+                    .productId(item.getProductId())
+                    .quantity(item.getQuantity())
+                    .unitPrice(product.getPrice())
+                    .build();
+
             total = total.add(product.getPrice().multiply(BigDecimal.valueOf(item.getQuantity())));
 
             pEntity.setStockQuantity(product.getQuantity());
             productRepository.save(pEntity);
         }
 
+        List<OrderProduct> orderItems = request.getItems().stream()
+                .map(item -> {
+                    ProductEntity pEntity = productRepository.findByIdAndActiveTrue(item.getProductId())
+                            .orElseThrow(() -> new IllegalArgumentException("Product not found or disabled"));
+                    return OrderProduct.builder()
+                            .productId(item.getProductId())
+                            .quantity(item.getQuantity())
+                            .unitPrice(pEntity.getPrice())
+                            .build();
+                })
+                .collect(Collectors.toList());
+
         Order order = Order.builder()
                 .userId(userId)
                 .totalPrice(total)
                 .orderStatus(OrderStatus.APPROVED)
-                .orderProducts(items)
+                .orderProducts(orderItems)
                 .active(true)
                 .build();
 
