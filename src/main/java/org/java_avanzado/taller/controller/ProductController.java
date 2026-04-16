@@ -1,11 +1,13 @@
 package org.java_avanzado.taller.controller;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
-import org.java_avanzado.taller.domain.model.Product;
+import org.java_avanzado.taller.controller.dto.request.create.CreateProductRequest;
+import org.java_avanzado.taller.controller.dto.request.update.UpdateProductRequest;
+import org.java_avanzado.taller.controller.dto.response.ProductResponse;
+import org.java_avanzado.taller.controller.dto.response.ProductSummaryResponse;
 import org.java_avanzado.taller.service.ProductService;
+import org.java_avanzado.taller.utils.mapper.ProductResponseMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,25 +19,26 @@ import java.util.List;
 public class ProductController {
 
     private final ProductService productService;
+    private final ProductResponseMapper productResponseMapper;
 
     @GetMapping
-    public ResponseEntity<List<Product>> getAllProducts() {
-        return ResponseEntity.ok(productService.getAllActiveProducts());
+    public ResponseEntity<List<ProductSummaryResponse>> getAllProducts() {
+        return ResponseEntity.ok(productResponseMapper.toSummaryList(productService.getAllActiveProducts()));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Product> getProductById(@PathVariable Long id) {
-        return ResponseEntity.ok(productService.getActiveProduct(id));
+    public ResponseEntity<ProductResponse> getProductById(@PathVariable Long id) {
+        return ResponseEntity.ok(productResponseMapper.toResponse(productService.getActiveProduct(id)));
     }
 
     @PostMapping
-    public ResponseEntity<Product> createProduct(@Valid @RequestBody Product product) {
-        return ResponseEntity.ok(productService.createProduct(product));
+    public ResponseEntity<ProductResponse> createProduct(@Valid @RequestBody CreateProductRequest request) {
+        return ResponseEntity.ok(productResponseMapper.toResponse(productService.createProduct(request)));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Product> updateProduct(@PathVariable Long id, @Valid @RequestBody Product product) {
-        return ResponseEntity.ok(productService.updateProduct(id, product));
+    public ResponseEntity<ProductResponse> updateProduct(@PathVariable Long id, @Valid @RequestBody UpdateProductRequest request) {
+        return ResponseEntity.ok(productResponseMapper.toResponse(productService.updateProduct(id, request)));
     }
 
     @DeleteMapping("/{id}")
