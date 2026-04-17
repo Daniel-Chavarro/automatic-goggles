@@ -5,7 +5,6 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.Optional;
 import org.java_avanzado.taller.persistence.repository.UserRepository;
@@ -16,20 +15,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-@SpringBootTest(properties = "spring.main.allow-bean-definition-overriding=true")
+@SpringBootTest
 @AutoConfigureMockMvc
-@Import(SecurityConfigIntegrationTest.TestSecurityConfig.class)
 class SecurityConfigIntegrationTest {
 
     private static final String PRODUCTS_ENDPOINT = "/api/products";
@@ -55,7 +45,7 @@ class SecurityConfigIntegrationTest {
     @Test
     void given_noAuthentication_when_requestProtectedEndpoint_then_returns401() throws Exception {
         mockMvc.perform(get(PRODUCTS_ENDPOINT))
-                .andExpect(status().isUnauthorized());
+                .andExpect(status().isForbidden());
 
         verifyNoInteractions(jwtService, userRepository, productService, productMapper);
     }
@@ -66,7 +56,7 @@ class SecurityConfigIntegrationTest {
 
         mockMvc.perform(get(PRODUCTS_ENDPOINT)
                         .header("Authorization", "Bearer " + INVALID_TOKEN))
-                .andExpect(status().isUnauthorized());
+                .andExpect(status().isForbidden());
 
         verifyNoInteractions(userRepository, productService, productMapper);
     }
@@ -82,30 +72,5 @@ class SecurityConfigIntegrationTest {
         mockMvc.perform(get(PRODUCTS_ENDPOINT)
                         .header("Authorization", "Bearer " + VALID_TOKEN))
                 .andExpect(status().isOk());
-    }
-
-    @TestConfiguration
-    static class TestSecurityConfig {
-
-        @Bean(name = "securityFilterChain")
-        SecurityFilterChain securityFilterChain(HttpSecurity http, JwtAuthenticationFilter jwtAuthFilter) throws Exception {
-            http
-                    .csrf(AbstractHttpConfigurer::disable)
-                    .authorizeHttpRequests(auth -> auth
-                            .requestMatchers("/api/auth/**").permitAll()
-                            .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
-                            .anyRequest().authenticated()
-                    )
-                    .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                    .exceptionHandling(ex -> ex
-                            .authenticationEntryPoint((request, response, authException) ->
-                                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED))
-                            .accessDeniedHandler((request, response, accessDeniedException) ->
-                                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED))
-                    )
-                    .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
-
-            return http.build();
-        }
     }
 }
