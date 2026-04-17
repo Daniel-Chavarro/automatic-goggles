@@ -41,7 +41,7 @@ class AuthControllerTest {
     private JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Test
-    void given_validRegisterPayload_when_register_then_returns200AndToken() throws Exception {
+    void given_validRegisterPayload_when_register_then_returnsTokenResponse() throws Exception {
         when(userService.registerUser(any(User.class))).thenReturn("jwt-token");
 
         String requestBody = """
@@ -64,7 +64,7 @@ class AuthControllerTest {
     }
 
     @Test
-    void given_missingCredentialsPayload_when_login_then_returns400() throws Exception {
+    void given_missingCredentialsPayload_when_login_then_returnsBadRequest() throws Exception {
         String requestBody = """
                 {
                   \"email\": \"ana@example.com\"

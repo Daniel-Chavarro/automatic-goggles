@@ -64,20 +64,29 @@ class SecurityConfigIntegrationTest {
     }
 
     @Test
-    void given_invalidToken_when_requestProtectedEndpoint_then_returns401_and_stopsBeforeDownstreamServices() throws Exception {
+    void given_invalidToken_when_requestProtectedEndpoint_then_doesNotValidateTokenAgainstUser() throws Exception {
         when(jwtService.extractUsername(INVALID_TOKEN)).thenThrow(new RuntimeException("Invalid JWT"));
 
         mockMvc.perform(get(PRODUCTS_ENDPOINT)
-                .header("Authorization", "Bearer " + INVALID_TOKEN))
+                        .header("Authorization", "Bearer " + INVALID_TOKEN))
                 .andExpect(status().isUnauthorized());
 
-        verify(jwtService).extractUsername(INVALID_TOKEN);
         verify(jwtService, never()).isTokenValid(INVALID_TOKEN, USER_EMAIL);
+    }
+
+    @Test
+    void given_invalidToken_when_requestProtectedEndpoint_then_doesNotInvokeDownstreamServices() throws Exception {
+        when(jwtService.extractUsername(INVALID_TOKEN)).thenThrow(new RuntimeException("Invalid JWT"));
+
+        mockMvc.perform(get(PRODUCTS_ENDPOINT)
+                        .header("Authorization", "Bearer " + INVALID_TOKEN))
+                .andExpect(status().isUnauthorized());
+
         verifyNoInteractions(userRepository, productService, productMapper);
     }
 
     @Test
-    void given_validToken_and_userNotFound_when_requestProtectedEndpoint_then_returns200() throws Exception {
+    void given_validTokenAndMissingUser_when_requestProtectedEndpoint_then_returnsOk() throws Exception {
         when(jwtService.extractUsername(VALID_TOKEN)).thenReturn(USER_EMAIL);
         when(jwtService.isTokenValid(VALID_TOKEN, USER_EMAIL)).thenReturn(true);
         when(userRepository.findByEmail(USER_EMAIL)).thenReturn(Optional.empty());
@@ -90,7 +99,7 @@ class SecurityConfigIntegrationTest {
     }
 
     @Test
-    void given_validClientToken_when_createProduct_then_returns403() throws Exception {
+    void given_validClientToken_when_createProduct_then_returnsForbidden() throws Exception {
         when(jwtService.extractUsername(VALID_TOKEN)).thenReturn(USER_EMAIL);
         when(jwtService.isTokenValid(VALID_TOKEN, USER_EMAIL)).thenReturn(true);
         UserEntity clientUser = new UserEntity();
@@ -114,7 +123,7 @@ class SecurityConfigIntegrationTest {
     }
 
     @Test
-    void given_validAdminToken_when_createProduct_then_returns200() throws Exception {
+    void given_validAdminToken_when_createProduct_then_returnsOk() throws Exception {
         Product createdProduct = mock(Product.class);
         ProductResponse response = mock(ProductResponse.class);
 
@@ -141,7 +150,7 @@ class SecurityConfigIntegrationTest {
     }
 
     @Test
-    void given_missingLoginCredentials_when_requestPermitAllLoginEndpoint_then_returns400() throws Exception {
+    void given_missingLoginCredentials_when_requestPermitAllLoginEndpoint_then_returnsBadRequest() throws Exception {
         mockMvc.perform(post(LOGIN_ENDPOINT)
                         .contentType("application/json")
                         .content("{}"))

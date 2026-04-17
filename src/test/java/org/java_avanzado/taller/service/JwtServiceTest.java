@@ -50,10 +50,16 @@ class JwtServiceTest {
         }
 
         @Test
-        void given_malformedToken_when_extractingOrValidating_then_throwsRuntimeException() {
+        void given_malformedToken_when_extractingUsername_then_throwsRuntimeException() {
             String malformedToken = "not-a-jwt";
 
             assertThrows(RuntimeException.class, () -> jwtService.extractUsername(malformedToken));
+        }
+
+        @Test
+        void given_malformedToken_when_validatingToken_then_throwsRuntimeException() {
+            String malformedToken = "not-a-jwt";
+
             assertThrows(RuntimeException.class, () -> jwtService.isTokenValid(malformedToken, "ana@example.com"));
         }
     }

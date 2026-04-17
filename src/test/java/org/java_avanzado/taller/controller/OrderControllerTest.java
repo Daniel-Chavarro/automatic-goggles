@@ -53,7 +53,7 @@ class OrderControllerTest {
     private JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Test
-    void given_validRequest_when_createOrderForUser_then_returns201AndOrderPayload() throws Exception {
+    void given_validRequest_when_createOrderForUser_then_returnsOrderPayload() throws Exception {
         UUID userId = UUID.fromString("11111111-1111-1111-1111-111111111111");
         var product = TestDataFactory.product();
         var order = TestDataFactory.order();
@@ -106,7 +106,7 @@ class OrderControllerTest {
     }
 
     @Test
-    void given_invalidRequest_when_createOrderForUser_then_returns400() throws Exception {
+    void given_invalidRequest_when_createOrderForUser_then_returnsBadRequest() throws Exception {
         UUID userId = UUID.fromString("11111111-1111-1111-1111-111111111111");
         String invalidRequestBody = """
                 {

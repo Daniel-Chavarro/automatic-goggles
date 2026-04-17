@@ -23,7 +23,7 @@ class ProductRepositoryTest {
         class WhenFindingByIdAndActiveTrue {
 
             @Test
-            void thenReturnsOnlyActiveProductById() {
+            void given_activeAndInactiveProductsWithSameName_when_findingByIdAndActiveTrue_then_returnsOnlyActiveProductById() {
                 ProductEntity activeProduct = productRepository.save(buildProduct("Laptop", true, new BigDecimal("2500.00")));
                 ProductEntity inactiveProduct = productRepository.save(buildProduct("Laptop", false, new BigDecimal("2100.00")));
 
@@ -41,7 +41,7 @@ class ProductRepositoryTest {
         class WhenFindingAllByName {
 
             @Test
-            void thenReturnsOnlyProductsWithMatchingName() {
+            void given_productsWithDifferentNames_when_findingAllByName_then_returnsOnlyProductsWithMatchingName() {
                 ProductEntity firstCoffee = productRepository.save(buildProduct("Coffee", true, new BigDecimal("10.00")));
                 ProductEntity secondCoffee = productRepository.save(buildProduct("Coffee", false, new BigDecimal("12.00")));
                 productRepository.save(buildProduct("Tea", true, new BigDecimal("8.00")));
@@ -55,7 +55,7 @@ class ProductRepositoryTest {
             }
 
             @Test
-            void thenReturnsEmptyListWhenNoProductMatchesName() {
+            void given_noProductsWithRequestedName_when_findingAllByName_then_returnsEmptyList() {
                 productRepository.save(buildProduct("Tea", true, new BigDecimal("8.00")));
 
                 var results = productRepository.findAllByName("Coffee");

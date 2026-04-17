@@ -36,7 +36,7 @@ class UserControllerTest {
     private JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Test
-    void given_usersExist_when_getAllUsers_then_returns200AndSummaryList() throws Exception {
+    void given_usersExist_when_getAllUsers_then_returnsSummaryList() throws Exception {
         var user = TestDataFactory.user();
         var summary = UserSummaryResponse.builder()
                 .id(user.getId())

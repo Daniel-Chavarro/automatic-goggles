@@ -18,7 +18,7 @@ class UserMapperTest {
     class GivenUserEntity {
 
         @Test
-        void when_mappingToDomain_then_coreFieldsAreMapped() {
+        void given_userEntity_when_mappingToDomain_then_coreFieldsAreMapped() {
             var entity = TestDataFactory.userEntity();
 
             var result = mapper.fromUserEntityToDomain(entity);
@@ -37,7 +37,7 @@ class UserMapperTest {
     class GivenUpdateRequestAndExistingUser {
 
         @Test
-        void when_mappingToDomain_then_emailRoleAndPasswordArePreservedWhileMutableFieldsAreUpdated() {
+        void given_updateRequestAndExistingUser_when_mappingToDomain_then_emailRoleAndPasswordArePreservedWhileMutableFieldsAreUpdated() {
             var request = TestDataFactory.updateUserRequest();
             User existing = User.builder()
                     .id(UUID.fromString("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"))

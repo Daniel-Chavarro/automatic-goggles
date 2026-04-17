@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -49,7 +48,7 @@ class OrderServiceTest {
     class GivenCreateOrder {
 
         @Test
-        void given_availableProducts_when_createOrder_then_updatesStockAndPersistsOrder() {
+        void given_availableProducts_when_createOrder_then_returnsMappedSavedOrder() {
             UUID userId = UUID.fromString("11111111-1111-1111-1111-111111111111");
             var request = TestDataFactory.createOrderRequest();
 
@@ -68,9 +67,48 @@ class OrderServiceTest {
 
             assertSame(expectedOrder, result);
 
+            verify(orderRepository).save(mappedOrderEntity);
+            verify(orderMapper).fromOrderEntityToDomain(savedOrderEntity);
+        }
+
+        @Test
+        void given_availableProducts_when_createOrder_then_decrementsProductStockBeforeSaving() {
+            UUID userId = UUID.fromString("11111111-1111-1111-1111-111111111111");
+            var request = TestDataFactory.createOrderRequest();
+
+            ProductEntity productEntity = TestDataFactory.productEntity();
+            OrderEntity mappedOrderEntity = TestDataFactory.orderEntity();
+            OrderEntity savedOrderEntity = TestDataFactory.orderEntity();
+
+            when(productRepository.findByIdAndActiveTrue(1L)).thenReturn(Optional.of(productEntity));
+            when(productRepository.save(any(ProductEntity.class))).thenReturn(productEntity);
+            when(orderMapper.fromOrderToEntity(any(Order.class))).thenReturn(mappedOrderEntity);
+            when(orderRepository.save(mappedOrderEntity)).thenReturn(savedOrderEntity);
+            when(orderMapper.fromOrderEntityToDomain(savedOrderEntity)).thenReturn(TestDataFactory.order());
+
+            orderService.createOrder(userId, request);
+
             ArgumentCaptor<ProductEntity> productCaptor = ArgumentCaptor.forClass(ProductEntity.class);
             verify(productRepository).save(productCaptor.capture());
             assertEquals(18, productCaptor.getValue().getStockQuantity());
+        }
+
+        @Test
+        void given_availableProducts_when_createOrder_then_buildsOrderWithRequestData() {
+            UUID userId = UUID.fromString("11111111-1111-1111-1111-111111111111");
+            var request = TestDataFactory.createOrderRequest();
+
+            ProductEntity productEntity = TestDataFactory.productEntity();
+            OrderEntity mappedOrderEntity = TestDataFactory.orderEntity();
+            OrderEntity savedOrderEntity = TestDataFactory.orderEntity();
+
+            when(productRepository.findByIdAndActiveTrue(1L)).thenReturn(Optional.of(productEntity));
+            when(productRepository.save(any(ProductEntity.class))).thenReturn(productEntity);
+            when(orderMapper.fromOrderToEntity(any(Order.class))).thenReturn(mappedOrderEntity);
+            when(orderRepository.save(mappedOrderEntity)).thenReturn(savedOrderEntity);
+            when(orderMapper.fromOrderEntityToDomain(savedOrderEntity)).thenReturn(TestDataFactory.order());
+
+            orderService.createOrder(userId, request);
 
             ArgumentCaptor<Order> orderCaptor = ArgumentCaptor.forClass(Order.class);
             verify(orderMapper).fromOrderToEntity(orderCaptor.capture());
@@ -78,10 +116,6 @@ class OrderServiceTest {
             assertEquals(userId, builtOrder.getUserId());
             assertEquals(new BigDecimal("25.00"), builtOrder.getTotalPrice());
             assertEquals(1, builtOrder.getOrderProducts().size());
-
-            verify(productRepository, atLeastOnce()).findByIdAndActiveTrue(1L);
-            verify(orderRepository).save(mappedOrderEntity);
-            verify(orderMapper).fromOrderEntityToDomain(savedOrderEntity);
         }
 
         @Test
@@ -119,7 +153,7 @@ class OrderServiceTest {
     class GivenGetOrdersByUser {
 
         @Test
-        void given_repositoryResults_when_getOrdersByUser_then_mapsAndReturnsOrders() {
+        void given_repositoryResults_when_getOrdersByUser_then_returnsMappedOrders() {
             UUID userId = UUID.fromString("11111111-1111-1111-1111-111111111111");
             OrderEntity firstEntity = TestDataFactory.orderEntity();
             OrderEntity secondEntity = TestDataFactory.orderEntity();

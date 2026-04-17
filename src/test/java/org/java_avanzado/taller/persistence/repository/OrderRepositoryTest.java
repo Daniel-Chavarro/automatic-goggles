@@ -29,7 +29,7 @@ class OrderRepositoryTest {
         class WhenFindingAllByUserId {
 
             @Test
-            void thenReturnsOnlyRequestedUserOrders() {
+            void given_ordersFromMultipleUsers_when_findingAllByUserId_then_returnsOnlyRequestedUserOrders() {
                 UserEntity targetUser = userRepository.save(buildUser("target@example.com"));
                 UserEntity otherUser = userRepository.save(buildUser("other@example.com"));
 
@@ -46,7 +46,7 @@ class OrderRepositoryTest {
             }
 
             @Test
-            void thenReturnsEmptyListWhenUserHasNoOrders() {
+            void given_userWithoutOrders_when_findingAllByUserId_then_returnsEmptyList() {
                 UserEntity userWithoutOrders = userRepository.save(buildUser("without.orders@example.com"));
                 UserEntity otherUser = userRepository.save(buildUser("other@example.com"));
                 orderRepository.save(buildOrder(otherUser, new BigDecimal("300.00")));

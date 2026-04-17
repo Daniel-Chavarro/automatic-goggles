@@ -23,7 +23,7 @@ class UserRepositoryTest {
         class WhenFindingByEmail {
 
             @Test
-            void thenReturnsMatchingUser() {
+            void given_existingUserEmail_when_findingByEmail_then_returnsMatchingUser() {
                 UserEntity user = userRepository.save(buildUser("Ana", "Lopez", "ana@example.com", true));
 
                 var result = userRepository.findByEmail("ana@example.com");
@@ -38,7 +38,7 @@ class UserRepositoryTest {
         class WhenFindingByFirstNameLikeIgnoreCase {
 
             @Test
-            void thenReturnsCaseInsensitiveMatches() {
+            void given_usersWithDifferentCases_when_findingByFirstNameLikeIgnoreCase_then_returnsCaseInsensitiveMatches() {
                 UserEntity expectedOne = userRepository.save(buildUser("Ana", "Lopez", "ana.1@example.com", true));
                 UserEntity expectedTwo = userRepository.save(buildUser("ANABEL", "Ruiz", "ana.2@example.com", true));
                 userRepository.save(buildUser("Carlos", "Lopez", "carlos@example.com", true));
@@ -55,7 +55,7 @@ class UserRepositoryTest {
         class WhenFindingByLastNameLikeIgnoreCase {
 
             @Test
-            void thenReturnsCaseInsensitiveMatches() {
+            void given_usersWithDifferentCases_when_findingByLastNameLikeIgnoreCase_then_returnsCaseInsensitiveMatches() {
                 UserEntity expectedOne = userRepository.save(buildUser("Ana", "Lopez", "ana.3@example.com", true));
                 UserEntity expectedTwo = userRepository.save(buildUser("Luis", "LOPEZ RAMIREZ", "luis@example.com", true));
                 userRepository.save(buildUser("Maria", "Perez", "maria@example.com", true));
@@ -72,7 +72,7 @@ class UserRepositoryTest {
         class WhenFindingByIdAndActive {
 
             @Test
-            void thenMatchesOnlyRequestedStatus() {
+            void given_usersWithDifferentStatuses_when_findingByIdAndActive_then_matchesOnlyRequestedStatus() {
                 UserEntity activeUser = userRepository.save(buildUser("Andrea", "Paz", "andrea@example.com", true));
                 UserEntity inactiveUser = userRepository.save(buildUser("Bruno", "Paz", "bruno@example.com", false));
 

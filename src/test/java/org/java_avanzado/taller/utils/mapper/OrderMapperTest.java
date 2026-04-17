@@ -25,7 +25,7 @@ class OrderMapperTest {
     class GivenOrderEntity {
 
         @Test
-        void when_mappingToDomain_then_statusAndItemListAreMapped() {
+        void given_orderEntity_when_mappingToDomain_then_statusAndItemListAreMapped() {
             var entity = TestDataFactory.orderEntity();
 
             var result = mapper.fromOrderEntityToDomain(entity);
@@ -42,7 +42,7 @@ class OrderMapperTest {
     class GivenOrderDomainAndProductNameContext {
 
         @Test
-        void when_mappingToResponse_then_itemProductNameIsResolvedAndProductIdIsConvertedToLong() {
+        void given_orderDomainAndProductNameContext_when_mappingToResponse_then_itemProductNameIsResolvedAndProductIdIsConvertedToLong() {
             Order order = TestDataFactory.order();
             Map<String, String> productNameContext = Map.of("1", "Coffee");
 
@@ -55,7 +55,7 @@ class OrderMapperTest {
         }
 
         @Test
-        void when_mappingToResponseWithNonNumericProductId_then_numberFormatExceptionIsThrown() {
+        void given_orderWithNonNumericProductId_when_mappingToResponse_then_numberFormatExceptionIsThrown() {
             Order order = Order.builder()
                     .id(9L)
                     .userId(UUID.fromString("11111111-1111-1111-1111-111111111111"))
@@ -75,7 +75,7 @@ class OrderMapperTest {
         }
 
         @Test
-        void when_mappingToSummary_then_orderStatusIsMappedToStatus() {
+        void given_orderDomain_when_mappingToSummary_then_orderStatusIsMappedToStatus() {
             Order order = TestDataFactory.order();
 
             var result = mapper.fromOrderToSummary(order);
@@ -88,7 +88,7 @@ class OrderMapperTest {
     class GivenOrderDomain {
 
         @Test
-        void when_mappingToEntity_then_requiredRelationsAreMapped() {
+        void given_orderDomain_when_mappingToEntity_then_requiredRelationsAreMapped() {
             Order order = TestDataFactory.order();
 
             var result = mapper.fromOrderToEntity(order);
@@ -106,7 +106,7 @@ class OrderMapperTest {
     class GivenUpdateRequestAndExistingOrder {
 
         @Test
-        void when_mappingToDomain_then_statusIsUpdatedAndProtectedFieldsArePreserved() {
+        void given_updateRequestAndExistingOrder_when_mappingToDomain_then_statusIsUpdatedAndProtectedFieldsArePreserved() {
             UpdateOrderRequest request = new UpdateOrderRequest();
             request.setStatus(OrderStatus.REJECTED);
 

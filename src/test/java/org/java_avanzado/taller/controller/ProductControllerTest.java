@@ -43,7 +43,7 @@ class ProductControllerTest {
     private JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Test
-    void given_activeProductsExist_when_getAllProducts_then_returns200AndSummaryList() throws Exception {
+    void given_activeProductsExist_when_getAllProducts_then_returnsSummaryList() throws Exception {
         var product = TestDataFactory.product();
         var summary = ProductSummaryResponse.builder()
                 .id(1L)
@@ -63,7 +63,7 @@ class ProductControllerTest {
 
     @Test
     @WithMockUser(roles = "ADMIN")
-    void given_validRequest_when_createProduct_then_returns200AndProductPayload() throws Exception {
+    void given_validRequest_when_createProduct_then_returnsProductPayload() throws Exception {
         var createdProduct = TestDataFactory.product();
         var response = ProductResponse.builder()
                 .id(1L)
@@ -100,7 +100,7 @@ class ProductControllerTest {
 
     @Test
     @WithMockUser(roles = "ADMIN")
-    void given_invalidRequest_when_createProduct_then_returns400() throws Exception {
+    void given_invalidRequest_when_createProduct_then_returnsBadRequest() throws Exception {
         String invalidRequestBody = """
                 {
                   \"name\": \"\",

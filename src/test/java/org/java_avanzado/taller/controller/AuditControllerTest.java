@@ -32,7 +32,7 @@ class AuditControllerTest {
     private JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Test
-    void given_logsAvailable_when_getAuditLogs_then_returns200AndLogsContent() throws Exception {
+    void given_logsAvailable_when_getAuditLogs_then_returnsLogsContent() throws Exception {
         EventLogEntity log = new EventLogEntity();
         ReflectionTestUtils.setField(log, "id", 1L);
         ReflectionTestUtils.setField(log, "eventType", "LOGIN_SUCCESS");

@@ -18,7 +18,7 @@ class ProductMapperTest {
     class GivenProductEntity {
 
         @Test
-        void when_mappingToDomain_then_stockQuantityIsMappedAsQuantity() {
+        void given_productEntity_when_mappingToDomain_then_stockQuantityIsMappedAsQuantity() {
             var entity = TestDataFactory.productEntity();
             entity.setStockQuantity(42);
 
@@ -34,7 +34,7 @@ class ProductMapperTest {
     class GivenProductDomain {
 
         @Test
-        void when_mappingToResponse_then_quantityIsMappedAsStock() {
+        void given_productDomain_when_mappingToResponse_then_quantityIsMappedAsStock() {
             Product product = TestDataFactory.product();
 
             var result = mapper.fromProductToResponse(product);
@@ -47,7 +47,7 @@ class ProductMapperTest {
     class GivenUpdateRequestAndExistingProduct {
 
         @Test
-        void when_mappingToDomain_then_ignoredFieldsArePreservedAndUpdatableFieldsAreApplied() {
+        void given_updateRequestAndExistingProduct_when_mappingToDomain_then_ignoredFieldsArePreservedAndUpdatableFieldsAreApplied() {
             var request = TestDataFactory.updateProductRequest();
             Product existing = Product.builder()
                     .id(77L)
