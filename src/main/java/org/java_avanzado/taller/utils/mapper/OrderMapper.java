@@ -10,6 +10,8 @@ import org.java_avanzado.taller.domain.model.Order;
 import org.java_avanzado.taller.domain.model.OrderProduct;
 import org.java_avanzado.taller.persistence.entity.OrderEntity;
 import org.java_avanzado.taller.persistence.entity.OrderProductEntity;
+import org.java_avanzado.taller.persistence.entity.ProductEntity;
+import org.java_avanzado.taller.persistence.entity.UserEntity;
 import org.mapstruct.Context;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -19,6 +21,7 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING, nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface OrderMapper {
@@ -26,10 +29,26 @@ public interface OrderMapper {
     // Entity <-> Domain
     @Mapping(source = "orderProducts", target = "orderProducts")
     Order fromOrderEntityToDomain(OrderEntity entity);
-    OrderEntity fromOrderToEntity(Order domain);
+
+    default OrderEntity fromOrderToEntity(Order domain) {
+        OrderEntity orderEntity = fromOrderToEntityInternal(domain);
+        if (orderEntity == null || orderEntity.getOrderProducts() == null) {
+            return orderEntity;
+        }
+        for (OrderProductEntity item : orderEntity.getOrderProducts()) {
+            item.setOrder(orderEntity);
+        }
+        return orderEntity;
+    }
+
+    @Mapping(source = "userId", target = "user", qualifiedByName = "uuidToUserEntity")
+    OrderEntity fromOrderToEntityInternal(Order domain);
 
     @Mapping(source = "product.id", target = "productId", qualifiedByName = "longToString")
     OrderProduct fromOrderProductEntityToDomain(OrderProductEntity entity);
+
+    @Mapping(source = "productId", target = "product", qualifiedByName = "stringToProductEntity")
+    @Mapping(target = "order", ignore = true)
     OrderProductEntity fromOrderProductToEntity(OrderProduct domain);
 
     // Create Request -> Domain
@@ -49,6 +68,8 @@ public interface OrderMapper {
     @Mapping(source = "orderStatus", target = "status")
     @Mapping(source = "orderProducts", target = "items")
     OrderResponse fromOrderToResponse(Order order, @Context Map<String, String> productNameContext);
+
+    @Mapping(source = "orderStatus", target = "status")
     OrderSummaryResponse fromOrderToSummary(Order order);
 
     // Order item with product name from context
@@ -69,4 +90,25 @@ public interface OrderMapper {
     default Long stringToLong(String value) {
         return value == null ? null : Long.valueOf(value);
     }
+
+    @Named("uuidToUserEntity")
+    default UserEntity uuidToUserEntity(UUID userId) {
+        if (userId == null) {
+            return null;
+        }
+        UserEntity user = new UserEntity();
+        user.setId(userId);
+        return user;
+    }
+
+    @Named("stringToProductEntity")
+    default ProductEntity stringToProductEntity(String productId) {
+        if (productId == null) {
+            return null;
+        }
+        ProductEntity product = new ProductEntity();
+        product.setId(Long.valueOf(productId));
+        return product;
+    }
+
 }

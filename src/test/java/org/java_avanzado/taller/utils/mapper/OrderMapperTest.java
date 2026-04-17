@@ -1,6 +1,7 @@
 package org.java_avanzado.taller.utils.mapper;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.math.BigDecimal;
@@ -71,6 +72,33 @@ class OrderMapperTest {
             Map<String, String> productNameContext = Map.of("ABC", "Coffee");
 
             assertThrows(NumberFormatException.class, () -> mapper.fromOrderToResponse(order, productNameContext));
+        }
+
+        @Test
+        void when_mappingToSummary_then_orderStatusIsMappedToStatus() {
+            Order order = TestDataFactory.order();
+
+            var result = mapper.fromOrderToSummary(order);
+
+            assertEquals(order.getOrderStatus(), result.getStatus());
+        }
+    }
+
+    @Nested
+    class GivenOrderDomain {
+
+        @Test
+        void when_mappingToEntity_then_requiredRelationsAreMapped() {
+            Order order = TestDataFactory.order();
+
+            var result = mapper.fromOrderToEntity(order);
+
+            assertNotNull(result.getUser());
+            assertEquals(order.getUserId(), result.getUser().getId());
+            assertEquals(order.getOrderProducts().size(), result.getOrderProducts().size());
+            assertNotNull(result.getOrderProducts().get(0).getProduct());
+            assertEquals(1L, result.getOrderProducts().get(0).getProduct().getId());
+            assertEquals(result, result.getOrderProducts().get(0).getOrder());
         }
     }
 

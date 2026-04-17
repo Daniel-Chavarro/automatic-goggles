@@ -37,6 +37,7 @@ public interface ProductMapper {
     Product fromUpdateProductRequestToDomain(UpdateProductRequest request, Product existingProduct);
 
     // Domain -> Response
+    @Mapping(source = "quantity", target = "stock")
     ProductResponse fromProductToResponse(Product product);
     ProductSummaryResponse fromProductToSummary(Product product);
 

@@ -31,6 +31,19 @@ class ProductMapperTest {
     }
 
     @Nested
+    class GivenProductDomain {
+
+        @Test
+        void when_mappingToResponse_then_quantityIsMappedAsStock() {
+            Product product = TestDataFactory.product();
+
+            var result = mapper.fromProductToResponse(product);
+
+            assertEquals(product.getQuantity(), result.getStock());
+        }
+    }
+
+    @Nested
     class GivenUpdateRequestAndExistingProduct {
 
         @Test
