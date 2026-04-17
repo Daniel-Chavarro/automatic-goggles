@@ -83,7 +83,7 @@ public final class TestDataFactory {
                 .lastName("Lopez")
                 .email("ana@example.com")
                 .phone("3001112233")
-                .password("$2a$10$hash")
+                .password("$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy")
                 .role(UserRole.CLIENT)
                 .active(true)
                 .build();
