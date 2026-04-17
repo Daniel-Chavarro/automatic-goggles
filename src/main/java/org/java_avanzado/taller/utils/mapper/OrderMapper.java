@@ -1,19 +1,73 @@
 package org.java_avanzado.taller.utils.mapper;
 
+import org.java_avanzado.taller.controller.dto.request.create.AddOrderItemRequest;
+import org.java_avanzado.taller.controller.dto.request.create.CreateOrderRequest;
+import org.java_avanzado.taller.controller.dto.request.update.UpdateOrderRequest;
+import org.java_avanzado.taller.controller.dto.response.OrderItemResponse;
+import org.java_avanzado.taller.controller.dto.response.OrderResponse;
+import org.java_avanzado.taller.controller.dto.response.OrderSummaryResponse;
 import org.java_avanzado.taller.domain.model.Order;
 import org.java_avanzado.taller.domain.model.OrderProduct;
 import org.java_avanzado.taller.persistence.entity.OrderEntity;
 import org.java_avanzado.taller.persistence.entity.OrderProductEntity;
+import org.mapstruct.Context;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
+import org.mapstruct.Named;
+import org.mapstruct.NullValuePropertyMappingStrategy;
 
-@Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+@Mapper(componentModel = MappingConstants.ComponentModel.SPRING, nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface OrderMapper {
-    Order toDomain(OrderEntity entity);
 
-    OrderEntity toEntity(Order domain);
+    // Entity <-> Domain
+    @Mapping(source = "orderStatus", target = "orderStatus")
+    @Mapping(source = "orderProducts", target = "orderProducts")
+    Order fromOrderEntityToDomain(OrderEntity entity);
+    OrderEntity fromOrderToEntity(Order domain);
 
-    OrderProduct toDomainProduct(OrderProductEntity entity);
-    OrderProductEntity toEntityProduct(OrderProduct domain);
+    @Mapping(source = "product.id", target = "productId", qualifiedByName = "longToString")
+    OrderProduct fromOrderProductEntityToDomain(OrderProductEntity entity);
+    OrderProductEntity fromOrderProductToEntity(OrderProduct domain);
+
+    // Create Request -> Domain
+    Order fromCreateOrderRequestToDomain(CreateOrderRequest request);
+    OrderProduct fromAddOrderItemRequestToDomain(AddOrderItemRequest request);
+
+    // Update Request -> Domain
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "userId", ignore = true)
+    @Mapping(target = "totalPrice", ignore = true)
+    @Mapping(target = "orderProducts", ignore = true)
+    @Mapping(target = "active", ignore = true)
+    Order fromUpdateOrderRequestToDomain(UpdateOrderRequest request, Order existingOrder);
+
+    // Domain -> Response (with additional parameter for product name)
+    @Mapping(source = "orderStatus", target = "status")
+    @Mapping(source = "orderProducts", target = "items")
+    OrderResponse fromOrderToResponse(Order order, @Context Map<String, String> productNameContext);
+    OrderSummaryResponse fromOrderToSummary(Order order);
+
+    // Order item with product name from context
+    @Mapping(source = "productId", target = "productId", qualifiedByName = "stringToLong")
+    @Mapping(target = "productName", expression = "java(productNameContext.get(item.getProductId()))")
+    OrderItemResponse fromOrderProductToItemResponse(OrderProduct item, @Context Map<String, String> productNameContext);
+
+    // List variants
+    List<OrderResponse> fromOrderListToResponseList(List<Order> orders, @Context Map<String, String> productNameContext);
+    List<OrderSummaryResponse> fromOrderListToSummaryList(List<Order> orders);
+
+    @Named("longToString")
+    default String longToString(Long value) {
+        return value == null ? null : String.valueOf(value);
+    }
+
+    @Named("stringToLong")
+    default Long stringToLong(String value) {
+        return value == null ? null : Long.valueOf(value);
+    }
 }
