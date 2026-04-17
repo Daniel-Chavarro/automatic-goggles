@@ -15,13 +15,12 @@ import org.java_avanzado.taller.persistence.entity.ProductEntity;
 import org.java_avanzado.taller.persistence.repository.ProductRepository;
 import org.java_avanzado.taller.support.TestDataFactory;
 import org.java_avanzado.taller.utils.mapper.ProductMapper;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.objenesis.ObjenesisStd;
 import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
@@ -33,14 +32,8 @@ class ProductServiceTest {
     @Mock
     private ProductMapper productMapper;
 
+    @InjectMocks
     private ProductService productService;
-
-    @BeforeEach
-    void setUp() {
-        productService = new ObjenesisStd().newInstance(ProductService.class);
-        ReflectionTestUtils.setField(productService, "productRepository", productRepository);
-        ReflectionTestUtils.setField(productService, "productMapper", productMapper);
-    }
 
     @Nested
     class GivenGetActiveProduct {
