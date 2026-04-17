@@ -17,7 +17,6 @@ import org.mapstruct.MappingConstants;
 import org.mapstruct.Named;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -25,7 +24,6 @@ import java.util.Map;
 public interface OrderMapper {
 
     // Entity <-> Domain
-    @Mapping(source = "orderStatus", target = "orderStatus")
     @Mapping(source = "orderProducts", target = "orderProducts")
     Order fromOrderEntityToDomain(OrderEntity entity);
     OrderEntity fromOrderToEntity(Order domain);
@@ -39,11 +37,12 @@ public interface OrderMapper {
     OrderProduct fromAddOrderItemRequestToDomain(AddOrderItemRequest request);
 
     // Update Request -> Domain
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "userId", ignore = true)
-    @Mapping(target = "totalPrice", ignore = true)
-    @Mapping(target = "orderProducts", ignore = true)
-    @Mapping(target = "active", ignore = true)
+    @Mapping(source = "existingOrder.id", target = "id")
+    @Mapping(source = "existingOrder.userId", target = "userId")
+    @Mapping(source = "existingOrder.totalPrice", target = "totalPrice")
+    @Mapping(source = "request.status", target = "orderStatus")
+    @Mapping(source = "existingOrder.orderProducts", target = "orderProducts")
+    @Mapping(source = "existingOrder.active", target = "active")
     Order fromUpdateOrderRequestToDomain(UpdateOrderRequest request, Order existingOrder);
 
     // Domain -> Response (with additional parameter for product name)
