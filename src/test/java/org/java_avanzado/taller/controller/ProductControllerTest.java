@@ -1,7 +1,9 @@
 package org.java_avanzado.taller.controller;
 
-import static org.mockito.Mockito.when;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -50,7 +52,7 @@ class ProductControllerTest {
                 .build();
 
         when(productService.getAllActiveProducts()).thenReturn(List.of(product));
-        when(productMapper.fromProductListToSummaryList(List.of(product))).thenReturn(List.of(summary));
+        when(productMapper.fromProductListToSummaryList(anyList())).thenReturn(List.of(summary));
 
         mockMvc.perform(get("/api/products"))
                 .andExpect(status().isOk())
@@ -62,7 +64,6 @@ class ProductControllerTest {
     @Test
     @WithMockUser(roles = "ADMIN")
     void given_validRequest_when_createProduct_then_returns200AndProductPayload() throws Exception {
-        CreateProductRequest request = TestDataFactory.createProductRequest();
         var createdProduct = TestDataFactory.product();
         var response = ProductResponse.builder()
                 .id(1L)
@@ -95,5 +96,24 @@ class ProductControllerTest {
                 .andExpect(jsonPath("$.price").value(12.50))
                 .andExpect(jsonPath("$.stock").value(20))
                 .andExpect(jsonPath("$.active").value(true));
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void given_invalidRequest_when_createProduct_then_returns400() throws Exception {
+        String invalidRequestBody = """
+                {
+                  \"name\": \"\",
+                  \"price\": -1,
+                  \"quantity\": -5
+                }
+                """;
+
+        mockMvc.perform(post("/api/products")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(invalidRequestBody))
+                .andExpect(status().isBadRequest());
+
+        verifyNoInteractions(productService, productMapper);
     }
 }

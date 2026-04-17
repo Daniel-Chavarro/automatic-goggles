@@ -1,7 +1,11 @@
 package org.java_avanzado.taller.controller;
 
 import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -9,6 +13,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import org.java_avanzado.taller.config.JwtAuthenticationFilter;
 import org.java_avanzado.taller.controller.dto.request.create.CreateOrderRequest;
@@ -20,6 +25,7 @@ import org.java_avanzado.taller.service.ProductService;
 import org.java_avanzado.taller.support.TestDataFactory;
 import org.java_avanzado.taller.utils.mapper.OrderMapper;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
@@ -49,8 +55,6 @@ class OrderControllerTest {
     @Test
     void given_validRequest_when_createOrderForUser_then_returns201AndOrderPayload() throws Exception {
         UUID userId = UUID.fromString("11111111-1111-1111-1111-111111111111");
-        CreateOrderRequest request = TestDataFactory.createOrderRequest();
-
         var product = TestDataFactory.product();
         var order = TestDataFactory.order();
         var response = OrderResponse.builder()
@@ -68,7 +72,7 @@ class OrderControllerTest {
                 .build();
 
         when(productService.getActiveProduct(1L)).thenReturn(product);
-        when(orderService.createOrder(userId, request)).thenReturn(order);
+        when(orderService.createOrder(eq(userId), any(CreateOrderRequest.class))).thenReturn(order);
         when(orderMapper.fromOrderToResponse(eq(order), anyMap())).thenReturn(response);
 
         String requestBody = """
@@ -94,5 +98,27 @@ class OrderControllerTest {
                 .andExpect(jsonPath("$.items[0].productName").value("Coffee"))
                 .andExpect(jsonPath("$.items[0].quantity").value(2))
                 .andExpect(jsonPath("$.items[0].unitPrice").value(12.50));
+
+        ArgumentCaptor<Map<String, String>> productNameMapCaptor = ArgumentCaptor.forClass(Map.class);
+        verify(orderMapper).fromOrderToResponse(eq(order), productNameMapCaptor.capture());
+        verify(productService).getActiveProduct(1L);
+        assertEquals("Coffee", productNameMapCaptor.getValue().get("1"));
+    }
+
+    @Test
+    void given_invalidRequest_when_createOrderForUser_then_returns400() throws Exception {
+        UUID userId = UUID.fromString("11111111-1111-1111-1111-111111111111");
+        String invalidRequestBody = """
+                {
+                  \"items\": []
+                }
+                """;
+
+        mockMvc.perform(post("/api/orders/user/{userId}", userId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(invalidRequestBody))
+                .andExpect(status().isBadRequest());
+
+        verifyNoInteractions(orderService, productService, orderMapper);
     }
 }

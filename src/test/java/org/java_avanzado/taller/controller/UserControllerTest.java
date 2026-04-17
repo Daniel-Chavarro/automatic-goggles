@@ -1,5 +1,6 @@
 package org.java_avanzado.taller.controller;
 
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -45,7 +46,7 @@ class UserControllerTest {
                 .build();
 
         when(userService.getAllUsers()).thenReturn(List.of(user));
-        when(userMapper.fromUserListToSummaryList(List.of(user))).thenReturn(List.of(summary));
+        when(userMapper.fromUserListToSummaryList(anyList())).thenReturn(List.of(summary));
 
         mockMvc.perform(get("/api/users"))
                 .andExpect(status().isOk())
