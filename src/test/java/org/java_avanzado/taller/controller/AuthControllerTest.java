@@ -1,33 +1,31 @@
 package org.java_avanzado.taller.controller;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import org.junit.jupiter.api.Assertions;
 import org.java_avanzado.taller.config.JwtAuthenticationFilter;
 import org.java_avanzado.taller.domain.model.User;
 import org.java_avanzado.taller.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.jackson.autoconfigure.JsonMapperBuilderCustomizer;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
-import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.http.HttpInputMessage;
 import org.springframework.http.MediaType;
-import org.springframework.http.converter.AbstractHttpMessageConverter;
-import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
-
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import org.mockito.ArgumentCaptor;
+import tools.jackson.databind.annotation.JsonDeserialize;
+import tools.jackson.databind.annotation.JsonPOJOBuilder;
 
 @WebMvcTest(AuthController.class)
 @AutoConfigureMockMvc(addFilters = false)
@@ -58,6 +56,11 @@ class AuthControllerTest {
                         .content(requestBody))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.token").value("jwt-token"));
+
+        ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
+        verify(userService).registerUser(userCaptor.capture());
+        Assertions.assertEquals("ana@example.com", ReflectionTestUtils.getField(userCaptor.getValue(), "email"));
+        Assertions.assertEquals("s3cret", ReflectionTestUtils.getField(userCaptor.getValue(), "password"));
     }
 
     @Test
@@ -79,33 +82,19 @@ class AuthControllerTest {
     @TestConfiguration
     static class AuthControllerTestConfig {
         @Bean
-        AbstractHttpMessageConverter<User> userMessageConverter() {
-            return new AbstractHttpMessageConverter<>(MediaType.APPLICATION_JSON) {
-                @Override
-                protected boolean supports(Class<?> clazz) {
-                    return User.class.isAssignableFrom(clazz);
-                }
-
-                @Override
-                protected User readInternal(Class<? extends User> clazz, HttpInputMessage inputMessage)
-                        throws IOException, HttpMessageNotReadableException {
-                    String body = new String(inputMessage.getBody().readAllBytes(), StandardCharsets.UTF_8);
-                    User user = mock(User.class);
-                    when(user.getEmail()).thenReturn(extractJsonValue(body, "email"));
-                    when(user.getPassword()).thenReturn(extractJsonValue(body, "password"));
-                    return user;
-                }
-
-                @Override
-                protected void writeInternal(User user, org.springframework.http.HttpOutputMessage outputMessage) {
-                }
-
-                private String extractJsonValue(String body, String field) {
-                    Pattern pattern = Pattern.compile("\\\"" + field + "\\\"\\s*:\\s*\\\"([^\\\"]*)\\\"");
-                    Matcher matcher = pattern.matcher(body);
-                    return matcher.find() ? matcher.group(1) : null;
-                }
+        JsonMapperBuilderCustomizer userMixinCustomizer() {
+            return builder -> {
+                builder.addMixIn(User.class, UserMixin.class);
+                builder.addMixIn(User.UserBuilder.class, UserBuilderMixin.class);
             };
         }
+    }
+
+    @JsonDeserialize(builder = User.UserBuilder.class)
+    private interface UserMixin {
+    }
+
+    @JsonPOJOBuilder(withPrefix = "")
+    private interface UserBuilderMixin {
     }
 }
