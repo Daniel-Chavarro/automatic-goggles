@@ -5,6 +5,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.when;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -71,7 +72,7 @@ class SecurityConfigIntegrationTest {
                         .header("Authorization", "Bearer " + INVALID_TOKEN))
                 .andExpect(status().isUnauthorized());
 
-        verify(jwtService, never()).isTokenValid(INVALID_TOKEN, USER_EMAIL);
+        verify(jwtService, never()).isTokenValid(anyString(), anyString());
     }
 
     @Test

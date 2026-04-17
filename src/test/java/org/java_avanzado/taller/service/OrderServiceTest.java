@@ -72,7 +72,7 @@ class OrderServiceTest {
         }
 
         @Test
-        void given_availableProducts_when_createOrder_then_decrementsProductStockBeforeSaving() {
+        void given_availableProducts_when_createOrder_then_decrementsProductStock() {
             UUID userId = UUID.fromString("11111111-1111-1111-1111-111111111111");
             var request = TestDataFactory.createOrderRequest();
 
