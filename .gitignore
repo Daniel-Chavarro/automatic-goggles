@@ -32,6 +32,9 @@ build/
 ### VS Code ###
 .vscode/
 
+### Environment files ###
+.env
+
 ## Agents and AI tools ###
 CLAUDE.md
 /.agents/
