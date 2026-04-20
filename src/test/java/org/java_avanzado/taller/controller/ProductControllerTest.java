@@ -79,10 +79,10 @@ class ProductControllerTest {
 
         String requestBody = """
                 {
-                  \"name\": \"Coffee\",
-                  \"description\": \"Ground coffee\",
-                  \"price\": 12.50,
-                  \"quantity\": 20
+                  "name": "Coffee",
+                  "description": "Ground coffee",
+                  "price": 12.50,
+                  "quantity": 20
                 }
                 """;
 
@@ -103,9 +103,9 @@ class ProductControllerTest {
     void given_invalidRequest_when_createProduct_then_returnsBadRequest() throws Exception {
         String invalidRequestBody = """
                 {
-                  \"name\": \"\",
-                  \"price\": -1,
-                  \"quantity\": -5
+                  "name": "",
+                  "price": -1,
+                  "quantity": -5
                 }
                 """;
 

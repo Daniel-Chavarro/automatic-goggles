@@ -1,4 +1,4 @@
-package org.java_avanzado.taller.config;
+package org.java_avanzado.taller.service;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

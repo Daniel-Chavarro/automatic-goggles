@@ -46,8 +46,8 @@ class AuthControllerTest {
 
         String requestBody = """
                 {
-                  \"email\": \"ana@example.com\",
-                  \"password\": \"s3cret\"
+                  "email": "ana@example.com",
+                  "password": "s3cret"
                 }
                 """;
 
@@ -67,7 +67,7 @@ class AuthControllerTest {
     void given_missingCredentialsPayload_when_login_then_returnsBadRequest() throws Exception {
         String requestBody = """
                 {
-                  \"email\": \"ana@example.com\"
+                  "email": "ana@example.com"
                 }
                 """;
 

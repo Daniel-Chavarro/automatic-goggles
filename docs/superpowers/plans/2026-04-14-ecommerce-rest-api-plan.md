@@ -113,6 +113,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.java_avanzado.taller.service.JwtService;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -254,7 +255,6 @@ public interface UserMapper {
 package org.java_avanzado.taller.service;
 
 import lombok.RequiredArgsConstructor;
-import org.java_avanzado.taller.config.JwtService;
 import org.java_avanzado.taller.domain.model.User;
 import org.java_avanzado.taller.domain.model.UserRole;
 import org.java_avanzado.taller.persistence.entity.UserEntity;

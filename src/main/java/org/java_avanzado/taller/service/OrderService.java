@@ -78,21 +78,21 @@ public class OrderService {
                 .active(true)
                 .build();
 
-        OrderEntity savedEntity = orderRepository.save(orderMapper.toEntity(order));
-        return orderMapper.toDomain(savedEntity);
+        OrderEntity savedEntity = orderRepository.save(orderMapper.fromOrderToEntity(order));
+        return orderMapper.fromOrderEntityToDomain(savedEntity);
     }
 
     @Transactional(readOnly = true)
     public List<Order> getOrdersByUser(UUID userId) {
         return orderRepository.findAllByUserId(userId).stream()
-                .map(orderMapper::toDomain)
+                .map(orderMapper::fromOrderEntityToDomain)
                 .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
     public List<Order> getAllOrders() {
         return orderRepository.findAll().stream()
-                .map(orderMapper::toDomain)
+                .map(orderMapper::fromOrderEntityToDomain)
                 .collect(Collectors.toList());
     }
 }

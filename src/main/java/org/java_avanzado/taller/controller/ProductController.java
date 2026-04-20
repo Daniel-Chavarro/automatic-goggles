@@ -7,8 +7,9 @@ import org.java_avanzado.taller.controller.dto.request.update.UpdateProductReque
 import org.java_avanzado.taller.controller.dto.response.ProductResponse;
 import org.java_avanzado.taller.controller.dto.response.ProductSummaryResponse;
 import org.java_avanzado.taller.service.ProductService;
-import org.java_avanzado.taller.utils.mapper.ProductResponseMapper;
+import org.java_avanzado.taller.utils.mapper.ProductMapper;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,29 +20,32 @@ import java.util.List;
 public class ProductController {
 
     private final ProductService productService;
-    private final ProductResponseMapper productResponseMapper;
+    private final ProductMapper productMapper;
 
     @GetMapping
     public ResponseEntity<List<ProductSummaryResponse>> getAllProducts() {
-        return ResponseEntity.ok(productResponseMapper.toSummaryList(productService.getAllActiveProducts()));
+        return ResponseEntity.ok(productMapper.fromProductListToSummaryList(productService.getAllActiveProducts()));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ProductResponse> getProductById(@PathVariable Long id) {
-        return ResponseEntity.ok(productResponseMapper.toResponse(productService.getActiveProduct(id)));
+        return ResponseEntity.ok(productMapper.fromProductToResponse(productService.getActiveProduct(id)));
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ProductResponse> createProduct(@Valid @RequestBody CreateProductRequest request) {
-        return ResponseEntity.ok(productResponseMapper.toResponse(productService.createProduct(request)));
+        return ResponseEntity.ok(productMapper.fromProductToResponse(productService.createProduct(request)));
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ProductResponse> updateProduct(@PathVariable Long id, @Valid @RequestBody UpdateProductRequest request) {
-        return ResponseEntity.ok(productResponseMapper.toResponse(productService.updateProduct(id, request)));
+        return ResponseEntity.ok(productMapper.fromProductToResponse(productService.updateProduct(id, request)));
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
         productService.deleteProduct(id);
         return ResponseEntity.noContent().build();

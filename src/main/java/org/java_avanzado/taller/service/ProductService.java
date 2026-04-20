@@ -23,14 +23,14 @@ public class ProductService {
     public Product getActiveProduct(Long id) {
         ProductEntity entity = productRepository.findByIdAndActiveTrue(id)
                 .orElseThrow(() -> new ProductNotFoundException("Product not found or disabled"));
-        return productMapper.toDomain(entity);
+        return productMapper.fromProductEntityToDomain(entity);
     }
 
     @Transactional
     public Product createProduct(Product product) {
-        ProductEntity entity = productMapper.toEntity(product);
+        ProductEntity entity = productMapper.fromProductToEntity(product);
         entity.setActive(true);
-        return productMapper.toDomain(productRepository.save(entity));
+        return productMapper.fromProductEntityToDomain(productRepository.save(entity));
     }
 
     @Transactional
@@ -41,7 +41,7 @@ public class ProductService {
         entity.setDescription(product.getDescription());
         entity.setPrice(product.getPrice());
         entity.setStockQuantity(product.getQuantity());
-        return productMapper.toDomain(productRepository.save(entity));
+        return productMapper.fromProductEntityToDomain(productRepository.save(entity));
     }
 
     @Transactional
@@ -56,7 +56,7 @@ public class ProductService {
     public List<Product> getAllActiveProducts() {
         return productRepository.findAll().stream()
                 .filter(ProductEntity::isActive)
-                .map(productMapper::toDomain)
+                .map(productMapper::fromProductEntityToDomain)
                 .collect(Collectors.toList());
     }
 
@@ -70,8 +70,8 @@ public class ProductService {
                 .active(true)
                 .build();
 
-        ProductEntity entity = productMapper.toEntity(product);
-        return productMapper.toDomain(productRepository.save(entity));
+        ProductEntity entity = productMapper.fromProductToEntity(product);
+        return productMapper.fromProductEntityToDomain(productRepository.save(entity));
     }
 
     @Transactional
@@ -92,6 +92,6 @@ public class ProductService {
             entity.setStockQuantity(request.getQuantity());
         }
 
-        return productMapper.toDomain(productRepository.save(entity));
+        return productMapper.fromProductEntityToDomain(productRepository.save(entity));
     }
 }

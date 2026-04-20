@@ -77,10 +77,10 @@ class OrderControllerTest {
 
         String requestBody = """
                 {
-                  \"items\": [
+                  "items": [
                     {
-                      \"productId\": 1,
-                      \"quantity\": 2
+                      "productId": 1,
+                      "quantity": 2
                     }
                   ]
                 }
@@ -110,7 +110,7 @@ class OrderControllerTest {
         UUID userId = UUID.fromString("11111111-1111-1111-1111-111111111111");
         String invalidRequestBody = """
                 {
-                  \"items\": []
+                  "items": []
                 }
                 """;
 

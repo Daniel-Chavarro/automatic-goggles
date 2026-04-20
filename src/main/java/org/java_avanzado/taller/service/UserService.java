@@ -1,7 +1,6 @@
 package org.java_avanzado.taller.service;
 
 import lombok.RequiredArgsConstructor;
-import org.java_avanzado.taller.config.JwtService;
 import org.java_avanzado.taller.controller.dto.request.create.CreateUserRequest;
 import org.java_avanzado.taller.controller.dto.request.update.UpdateUserRequest;
 import org.java_avanzado.taller.domain.exception.EmailAlreadyExistsException;
@@ -41,7 +40,7 @@ public class UserService {
         if (userRepository.findByEmail(user.getEmail()).isPresent()) {
             throw new EmailAlreadyExistsException("Email already in use");
         }
-        UserEntity entity = userMapper.toEntity(user);
+        UserEntity entity = userMapper.fromUserToEntity(user);
         entity.setPassword(passwordEncoder.encode(user.getPassword()));
         entity.setActive(true);
         if (entity.getRole() == null) {
@@ -66,14 +65,14 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public User getUserById(UUID id) {
-        return userRepository.findById(id).map(userMapper::toDomain)
+        return userRepository.findById(id).map(userMapper::fromUserEntityToDomain)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
     }
 
     @Transactional(readOnly = true)
     public List<User> getAllUsers() {
         return userRepository.findAll().stream()
-                .map(userMapper::toDomain)
+                .map(userMapper::fromUserEntityToDomain)
                 .collect(Collectors.toList());
     }
 
@@ -107,9 +106,9 @@ public class UserService {
                 .active(true)
                 .build();
 
-        UserEntity entity = userMapper.toEntity(user);
+        UserEntity entity = userMapper.fromUserToEntity(user);
         entity.setPassword(passwordEncoder.encode(user.getPassword()));
-        return userMapper.toDomain(userRepository.save(entity));
+        return userMapper.fromUserEntityToDomain(userRepository.save(entity));
     }
 
     @Transactional
@@ -127,6 +126,6 @@ public class UserService {
             entity.setPhone(request.getPhone());
         }
 
-        return userMapper.toDomain(userRepository.save(entity));
+        return userMapper.fromUserEntityToDomain(userRepository.save(entity));
     }
 }
