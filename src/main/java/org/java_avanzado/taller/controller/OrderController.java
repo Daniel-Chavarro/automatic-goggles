@@ -18,6 +18,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+/**
+ * Exposes order management endpoints.
+ */
 @RestController
 @RequestMapping("/api/orders")
 @RequiredArgsConstructor
@@ -27,6 +30,13 @@ public class OrderController {
     private final ProductService productService;
     private final OrderMapper orderMapper;
 
+    /**
+     * Creates a new order for the given user.
+     *
+     * @param userId user identifier
+     * @param request validated order payload
+     * @return the created order with resolved product names
+     */
     @PostMapping("/user/{userId}")
     public ResponseEntity<OrderResponse> createOrder(@PathVariable UUID userId, @Valid @RequestBody CreateOrderRequest request) {
         Map<String, String> productNames = buildProductNameMap(request.getItems().stream()
@@ -35,12 +45,23 @@ public class OrderController {
         return ResponseEntity.status(HttpStatus.CREATED).body(orderMapper.fromOrderToResponse(orderService.createOrder(userId, request), productNames));
     }
 
+    /**
+     * Returns the orders associated with a user.
+     *
+     * @param userId user identifier
+     * @return the user order summaries
+     */
     @Transactional(readOnly = true)
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<OrderSummaryResponse>> getUserOrders(@PathVariable UUID userId) {
         return ResponseEntity.ok(orderMapper.fromOrderListToSummaryList(orderService.getOrdersByUser(userId)));
     }
 
+    /**
+     * Returns all orders in the system.
+     *
+     * @return the order summaries
+     */
     @Transactional(readOnly = true)
     @GetMapping
     public ResponseEntity<List<OrderSummaryResponse>> getAllOrders() {

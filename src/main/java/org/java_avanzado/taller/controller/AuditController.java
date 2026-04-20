@@ -10,6 +10,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+/**
+ * Exposes audit log retrieval endpoints.
+ */
 @RestController
 @RequestMapping("/api/audit")
 @RequiredArgsConstructor
@@ -17,6 +20,11 @@ public class AuditController {
 
     private final EventLogService eventLogService;
 
+    /**
+     * Returns all audit log entries.
+     *
+     * @return the stored audit events
+     */
     @GetMapping
     public ResponseEntity<List<EventLogEntity>> getAuditLogs() {
         return ResponseEntity.ok(eventLogService.getAllLogs());
