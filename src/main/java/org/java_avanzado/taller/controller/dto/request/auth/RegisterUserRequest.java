@@ -1,7 +1,6 @@
-package org.java_avanzado.taller.controller.dto.request.create;
+package org.java_avanzado.taller.controller.dto.request.auth;
 
 import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;

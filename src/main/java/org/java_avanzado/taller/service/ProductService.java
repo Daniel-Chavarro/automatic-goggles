@@ -13,6 +13,12 @@ import org.java_avanzado.taller.utils.mapper.ProductMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * Service for product catalog management operations.
+ *
+ * <p>Handles product creation, retrieval, updates, and deletion
+ * within the coffee shop product catalog.</p>
+ */
 @Service
 @RequiredArgsConstructor
 public class ProductService {

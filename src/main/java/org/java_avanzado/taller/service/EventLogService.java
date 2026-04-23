@@ -10,6 +10,12 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 
+/**
+ * Service for logging and retrieving audit events.
+ *
+ * <p>Provides asynchronous event logging for security monitoring
+ * and audit trail purposes.</p>
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j

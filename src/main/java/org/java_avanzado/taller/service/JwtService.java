@@ -13,6 +13,12 @@ import java.util.function.Function;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Service for JWT token generation and validation.
+ *
+ * <p>Handles token creation, claim extraction, and validation
+ * for stateless authentication.</p>
+ */
 @Service
 public class JwtService {
 

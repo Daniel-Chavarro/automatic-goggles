@@ -3,7 +3,9 @@ package org.java_avanzado.taller.service;
 import lombok.RequiredArgsConstructor;
 import org.java_avanzado.taller.controller.dto.request.create.CreateUserRequest;
 import org.java_avanzado.taller.controller.dto.request.update.UpdateUserRequest;
+import org.java_avanzado.taller.domain.exception.BadCredentialsException;
 import org.java_avanzado.taller.domain.exception.EmailAlreadyExistsException;
+import org.java_avanzado.taller.domain.exception.InactiveUserException;
 import org.java_avanzado.taller.domain.exception.UserNotFoundException;
 import org.java_avanzado.taller.domain.model.User;
 import org.java_avanzado.taller.domain.model.UserRole;
@@ -18,6 +20,12 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+/**
+ * Service for user management operations.
+ *
+ * <p>Handles user registration, authentication, retrieval,
+ * and administrative updates.</p>
+ */
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -26,6 +34,14 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
 
+    /**
+     * Registers a new user with the provided credentials.
+     *
+     * @param user the user domain model containing registration data
+     * @return a JWT token for the newly registered user
+     * @throws IllegalArgumentException if user, email, or password is missing
+     * @throws EmailAlreadyExistsException if the email is already registered
+     */
     @Transactional
     public String registerUser(User user) {
         if (user == null) {
@@ -50,25 +66,46 @@ public class UserService {
         return jwtService.generateToken(entity.getEmail());
     }
 
+/**
+     * Authenticates a user with email and password.
+     *
+     * @param email the user's email address
+     * @param password the user's plain-text password
+     * @return a JWT token if authentication succeeds
+     * @throws BadCredentialsException if email not found or password mismatch
+     * @throws InactiveUserException if the account is disabled
+     */
     @Transactional(readOnly = true)
     public String authenticate(String email, String password) {
         UserEntity user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid credentials"));
+                .orElseThrow(() -> new BadCredentialsException("Invalid credentials"));
         if (!passwordEncoder.matches(password, user.getPassword())) {
-            throw new IllegalArgumentException("Invalid credentials");
+            throw new BadCredentialsException("Invalid credentials");
         }
         if (!user.isActive()) {
-            throw new IllegalArgumentException("Account disabled");
+            throw new InactiveUserException("Account disabled");
         }
         return jwtService.generateToken(email);
     }
 
+    /**
+     * Retrieves a user by their unique identifier.
+     *
+     * @param id the user's UUID
+     * @return the user domain model
+     * @throws UserNotFoundException if no user exists with the given ID
+     */
     @Transactional(readOnly = true)
     public User getUserById(UUID id) {
         return userRepository.findById(id).map(userMapper::fromUserEntityToDomain)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
     }
 
+    /**
+     * Retrieves all registered users.
+     *
+     * @return a list of all user domain models
+     */
     @Transactional(readOnly = true)
     public List<User> getAllUsers() {
         return userRepository.findAll().stream()
@@ -76,6 +113,12 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Disables a user account, preventing login.
+     *
+     * @param id the user's UUID to disable
+     * @throws UserNotFoundException if no user exists with the given ID
+     */
     @Transactional
     public void disableUser(UUID id) {
         UserEntity entity = userRepository.findById(id)

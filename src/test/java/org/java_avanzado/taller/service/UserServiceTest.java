@@ -9,7 +9,9 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.Optional;
+import org.java_avanzado.taller.domain.exception.BadCredentialsException;
 import org.java_avanzado.taller.domain.exception.EmailAlreadyExistsException;
+import org.java_avanzado.taller.domain.exception.InactiveUserException;
 import org.java_avanzado.taller.persistence.entity.UserEntity;
 import org.java_avanzado.taller.persistence.repository.UserRepository;
 import org.java_avanzado.taller.support.TestDataFactory;
@@ -111,7 +113,7 @@ class UserServiceTest {
         }
 
         @Test
-        void given_invalidPassword_when_authenticate_then_throwsIllegalArgumentException() {
+        void given_invalidPassword_when_authenticate_then_throwsBadCredentialsException() {
             UserEntity userEntity = TestDataFactory.userEntity();
             var user = TestDataFactory.user();
             String email = user.getEmail();
@@ -121,7 +123,7 @@ class UserServiceTest {
             when(userRepository.findByEmail(email)).thenReturn(Optional.of(userEntity));
             when(passwordEncoder.matches(rawPassword, storedPassword)).thenReturn(false);
 
-            assertThrows(IllegalArgumentException.class, () -> userService.authenticate(email, rawPassword));
+            assertThrows(BadCredentialsException.class, () -> userService.authenticate(email, rawPassword));
 
             verify(userRepository).findByEmail(email);
             verify(passwordEncoder).matches(rawPassword, storedPassword);
@@ -129,7 +131,7 @@ class UserServiceTest {
         }
 
         @Test
-        void given_inactiveUser_when_authenticate_then_throwsIllegalArgumentException() {
+        void given_inactiveUser_when_authenticate_then_throwsInactiveUserException() {
             UserEntity inactiveUserEntity = TestDataFactory.userEntity();
             inactiveUserEntity.setActive(false);
             var user = TestDataFactory.user();
@@ -140,7 +142,7 @@ class UserServiceTest {
             when(userRepository.findByEmail(email)).thenReturn(Optional.of(inactiveUserEntity));
             when(passwordEncoder.matches(rawPassword, storedPassword)).thenReturn(true);
 
-            assertThrows(IllegalArgumentException.class, () -> userService.authenticate(email, rawPassword));
+            assertThrows(InactiveUserException.class, () -> userService.authenticate(email, rawPassword));
 
             verify(userRepository).findByEmail(email);
             verify(passwordEncoder).matches(rawPassword, storedPassword);

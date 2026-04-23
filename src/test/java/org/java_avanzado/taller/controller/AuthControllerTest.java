@@ -12,20 +12,17 @@ import org.junit.jupiter.api.Assertions;
 import org.java_avanzado.taller.config.JwtAuthenticationFilter;
 import org.java_avanzado.taller.domain.model.User;
 import org.java_avanzado.taller.service.UserService;
+import org.java_avanzado.taller.support.TestDataFactory;
+import org.java_avanzado.taller.utils.mapper.UserMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.jackson.autoconfigure.JsonMapperBuilderCustomizer;
-import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
-import org.springframework.context.annotation.Bean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.mockito.ArgumentCaptor;
-import tools.jackson.databind.annotation.JsonDeserialize;
-import tools.jackson.databind.annotation.JsonPOJOBuilder;
 
 @WebMvcTest(AuthController.class)
 @AutoConfigureMockMvc(addFilters = false)
@@ -40,14 +37,21 @@ class AuthControllerTest {
     @MockitoBean
     private JwtAuthenticationFilter jwtAuthenticationFilter;
 
+    @MockitoBean
+    private UserMapper userMapper;
+
     @Test
     void given_validRegisterPayload_when_register_then_returnsTokenResponse() throws Exception {
+        User mappedUser = TestDataFactory.user();
+        when(userMapper.fromRegisterUserRequestToDomain(any())).thenReturn(mappedUser);
         when(userService.registerUser(any(User.class))).thenReturn("jwt-token");
 
         String requestBody = """
                 {
                   "email": "ana@example.com",
-                  "password": "s3cret"
+                  "firstName": "Ana",
+                  "lastName": "Test",
+                  "password": "S3cretPass"
                 }
                 """;
 
@@ -60,7 +64,7 @@ class AuthControllerTest {
         ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
         verify(userService).registerUser(userCaptor.capture());
         Assertions.assertEquals("ana@example.com", ReflectionTestUtils.getField(userCaptor.getValue(), "email"));
-        Assertions.assertEquals("s3cret", ReflectionTestUtils.getField(userCaptor.getValue(), "password"));
+        Assertions.assertEquals("StrongPass1", ReflectionTestUtils.getField(userCaptor.getValue(), "password"));
     }
 
     @Test
@@ -79,22 +83,4 @@ class AuthControllerTest {
         verifyNoInteractions(userService);
     }
 
-    @TestConfiguration
-    static class AuthControllerTestConfig {
-        @Bean
-        JsonMapperBuilderCustomizer userMixinCustomizer() {
-            return builder -> {
-                builder.addMixIn(User.class, UserMixin.class);
-                builder.addMixIn(User.UserBuilder.class, UserBuilderMixin.class);
-            };
-        }
-    }
-
-    @JsonDeserialize(builder = User.UserBuilder.class)
-    private interface UserMixin {
-    }
-
-    @JsonPOJOBuilder(withPrefix = "")
-    private interface UserBuilderMixin {
-    }
 }

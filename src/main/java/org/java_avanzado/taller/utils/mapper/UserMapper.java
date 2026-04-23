@@ -1,7 +1,7 @@
 package org.java_avanzado.taller.utils.mapper;
 
 import org.java_avanzado.taller.controller.dto.request.create.CreateUserRequest;
-import org.java_avanzado.taller.controller.dto.request.create.RegisterUserRequest;
+import org.java_avanzado.taller.controller.dto.request.auth.RegisterUserRequest;
 import org.java_avanzado.taller.controller.dto.request.update.UpdateUserRequest;
 import org.java_avanzado.taller.controller.dto.response.UserResponse;
 import org.java_avanzado.taller.controller.dto.response.UserSummaryResponse;

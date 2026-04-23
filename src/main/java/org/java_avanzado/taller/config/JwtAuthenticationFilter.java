@@ -22,6 +22,12 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * JWT authentication filter for incoming requests.
+ *
+ * <p>Validates Bearer tokens from the Authorization header and
+ * populates the SecurityContext with authenticated principal.</p>
+ */
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {

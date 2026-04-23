@@ -6,6 +6,15 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Repository for Order entity persistence operations.
+ *
+ * <p>Provides standard JPA CRUD operations and custom
+ * queries for order retrieval.</p>
+ */
 public interface OrderRepository extends JpaRepository<OrderEntity, Long> {
+    /**
+     * Finds all orders for a specific user.
+     */
     List<OrderEntity> findAllByUserId(UUID user_id);
 }

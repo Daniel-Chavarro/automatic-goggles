@@ -1,6 +1,8 @@
 package org.java_avanzado.taller.controller.advice;
 
 import org.java_avanzado.taller.domain.exception.InsufficientStockException;
+import org.java_avanzado.taller.domain.exception.BadCredentialsException;
+import org.java_avanzado.taller.domain.exception.InactiveUserException;
 import org.java_avanzado.taller.domain.exception.ProductNotFoundException;
 import org.java_avanzado.taller.domain.exception.UserNotFoundException;
 import org.springframework.http.HttpStatus;
@@ -37,6 +39,16 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ProductNotFoundException.class)
     public ResponseEntity<Map<String, String>> handleProductNotFound(ProductNotFoundException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", ex.getMessage()));
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<Map<String, String>> handleBadCredentials(BadCredentialsException ex) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", ex.getMessage()));
+    }
+
+    @ExceptionHandler(InactiveUserException.class)
+    public ResponseEntity<Map<String, String>> handleInactiveUser(InactiveUserException ex) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("error", ex.getMessage()));
     }
 
     @ExceptionHandler(IllegalArgumentException.class)

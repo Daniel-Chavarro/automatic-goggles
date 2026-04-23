@@ -14,6 +14,12 @@ import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+/**
+ * Security configuration for the application.
+ *
+ * <p>Configures JWT-based authentication, role-based access control,
+ * and session management policies.</p>
+ */
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
