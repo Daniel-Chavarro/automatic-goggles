@@ -7,7 +7,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.time.LocalDateTime;
 import java.util.List;
-import org.java_avanzado.taller.config.JwtAuthenticationFilter;
+import org.java_avanzado.taller.security.JwtAuthenticationFilter;
 import org.java_avanzado.taller.persistence.entity.EventLogEntity;
 import org.java_avanzado.taller.service.EventLogService;
 import org.junit.jupiter.api.Test;

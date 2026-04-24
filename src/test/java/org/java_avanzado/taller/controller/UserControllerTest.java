@@ -7,7 +7,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.List;
-import org.java_avanzado.taller.config.JwtAuthenticationFilter;
+import org.java_avanzado.taller.security.JwtAuthenticationFilter;
 import org.java_avanzado.taller.controller.dto.response.UserSummaryResponse;
 import org.java_avanzado.taller.service.UserService;
 import org.java_avanzado.taller.support.TestDataFactory;

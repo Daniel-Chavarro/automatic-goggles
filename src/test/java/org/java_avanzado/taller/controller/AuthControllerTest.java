@@ -9,7 +9,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.junit.jupiter.api.Assertions;
-import org.java_avanzado.taller.config.JwtAuthenticationFilter;
+import org.java_avanzado.taller.security.JwtAuthenticationFilter;
 import org.java_avanzado.taller.domain.model.User;
 import org.java_avanzado.taller.service.UserService;
 import org.java_avanzado.taller.support.TestDataFactory;

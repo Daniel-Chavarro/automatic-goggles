@@ -13,7 +13,7 @@ import java.util.List;
 import org.java_avanzado.taller.controller.dto.request.create.CreateProductRequest;
 import org.java_avanzado.taller.controller.dto.response.ProductResponse;
 import org.java_avanzado.taller.controller.dto.response.ProductSummaryResponse;
-import org.java_avanzado.taller.config.JwtAuthenticationFilter;
+import org.java_avanzado.taller.security.JwtAuthenticationFilter;
 import org.java_avanzado.taller.service.ProductService;
 import org.java_avanzado.taller.support.TestDataFactory;
 import org.java_avanzado.taller.utils.mapper.ProductMapper;

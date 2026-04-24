@@ -15,7 +15,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import org.java_avanzado.taller.config.JwtAuthenticationFilter;
+import org.java_avanzado.taller.security.JwtAuthenticationFilter;
 import org.java_avanzado.taller.controller.dto.request.create.CreateOrderRequest;
 import org.java_avanzado.taller.controller.dto.response.OrderItemResponse;
 import org.java_avanzado.taller.controller.dto.response.OrderResponse;
