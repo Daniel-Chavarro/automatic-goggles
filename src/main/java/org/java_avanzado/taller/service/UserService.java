@@ -102,6 +102,19 @@ public class UserService {
     }
 
     /**
+     * Retrieves a user by their email address.
+     *
+     * @param email the user's email
+     * @return the user domain model
+     * @throws UserNotFoundException if no user exists with the given email
+     */
+    @Transactional(readOnly = true)
+    public User getUserByEmail(String email) {
+        return userRepository.findByEmail(email).map(userMapper::fromUserEntityToDomain)
+                .orElseThrow(() -> new UserNotFoundException("User not found with email: " + email));
+    }
+
+    /**
      * Retrieves all registered users.
      *
      * @return a list of all user domain models
