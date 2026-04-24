@@ -1,4 +1,11 @@
 package org.java_avanzado.taller.controller.dto.response;
 
-public record TokenResponse() {
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+public record TokenResponse(
+        @JsonProperty("access_token")
+        String accessToken,
+        @JsonProperty("refresh_token")
+        String refreshToken
+) {
 }

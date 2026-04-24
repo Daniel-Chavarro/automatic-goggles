@@ -16,7 +16,7 @@ import java.util.Optional;
 import org.java_avanzado.taller.controller.dto.request.create.CreateProductRequest;
 import org.java_avanzado.taller.controller.dto.response.ProductResponse;
 import org.java_avanzado.taller.domain.model.Product;
-import org.java_avanzado.taller.domain.model.UserRole;
+import org.java_avanzado.taller.domain.model.enums.UserRole;
 import org.java_avanzado.taller.persistence.entity.UserEntity;
 import org.java_avanzado.taller.persistence.repository.UserRepository;
 import org.java_avanzado.taller.service.JwtService;

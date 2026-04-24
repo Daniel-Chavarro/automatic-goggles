@@ -3,7 +3,7 @@ package org.java_avanzado.taller.controller.dto.response;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 import lombok.Data;
-import org.java_avanzado.taller.domain.model.UserRole;
+import org.java_avanzado.taller.domain.model.enums.UserRole;
 
 import java.time.LocalDateTime;
 import java.util.UUID;

@@ -4,7 +4,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.java_avanzado.taller.controller.dto.request.auth.RegisterUserRequest;
-import org.java_avanzado.taller.domain.model.UserRole;
+import org.java_avanzado.taller.domain.model.enums.UserRole;
 
 @EqualsAndHashCode(callSuper = true)
 @Data

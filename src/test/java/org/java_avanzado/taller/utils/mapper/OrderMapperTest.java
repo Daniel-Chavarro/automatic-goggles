@@ -11,7 +11,7 @@ import java.util.UUID;
 import org.java_avanzado.taller.controller.dto.request.update.UpdateOrderRequest;
 import org.java_avanzado.taller.domain.model.Order;
 import org.java_avanzado.taller.domain.model.OrderProduct;
-import org.java_avanzado.taller.domain.model.OrderStatus;
+import org.java_avanzado.taller.domain.model.enums.OrderStatus;
 import org.java_avanzado.taller.support.TestDataFactory;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;

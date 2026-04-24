@@ -49,6 +49,7 @@ package org.java_avanzado.taller.support;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
+
 import org.java_avanzado.taller.controller.dto.request.create.AddOrderItemRequest;
 import org.java_avanzado.taller.controller.dto.request.create.CreateOrderRequest;
 import org.java_avanzado.taller.controller.dto.request.create.CreateProductRequest;
@@ -57,151 +58,152 @@ import org.java_avanzado.taller.controller.dto.request.update.UpdateProductReque
 import org.java_avanzado.taller.controller.dto.request.update.UpdateUserRequest;
 import org.java_avanzado.taller.domain.model.Order;
 import org.java_avanzado.taller.domain.model.OrderProduct;
-import org.java_avanzado.taller.domain.model.OrderStatus;
+import org.java_avanzado.taller.domain.model.enums.OrderStatus;
 import org.java_avanzado.taller.domain.model.Product;
 import org.java_avanzado.taller.domain.model.User;
-import org.java_avanzado.taller.domain.model.UserRole;
+import org.java_avanzado.taller.domain.model.enums.UserRole;
 import org.java_avanzado.taller.persistence.entity.OrderEntity;
 import org.java_avanzado.taller.persistence.entity.OrderProductEntity;
 import org.java_avanzado.taller.persistence.entity.ProductEntity;
 import org.java_avanzado.taller.persistence.entity.UserEntity;
 
 public final class TestDataFactory {
-    private TestDataFactory() {}
+  private TestDataFactory() {
+  }
 
-    public static Product product() {
-        return Product.builder()
-                .id(1L)
-                .name("Coffee")
-                .description("Ground coffee")
-                .price(new BigDecimal("12.50"))
-                .quantity(20)
-                .active(true)
-                .build();
-    }
+  public static Product product() {
+    return Product.builder()
+            .id(1L)
+            .name("Coffee")
+            .description("Ground coffee")
+            .price(new BigDecimal("12.50"))
+            .quantity(20)
+            .active(true)
+            .build();
+  }
 
-    public static ProductEntity productEntity() {
-        return ProductEntity.builder()
-                .id(1L)
-                .name("Coffee")
-                .description("Ground coffee")
-                .price(new BigDecimal("12.50"))
-                .stockQuantity(20)
-                .active(true)
-                .build();
-    }
+  public static ProductEntity productEntity() {
+    return ProductEntity.builder()
+            .id(1L)
+            .name("Coffee")
+            .description("Ground coffee")
+            .price(new BigDecimal("12.50"))
+            .stockQuantity(20)
+            .active(true)
+            .build();
+  }
 
-    public static CreateProductRequest createProductRequest() {
-        CreateProductRequest request = new CreateProductRequest();
-        request.setName("Coffee");
-        request.setDescription("Ground coffee");
-        request.setPrice(new BigDecimal("12.50"));
-        request.setQuantity(20);
-        return request;
-    }
+  public static CreateProductRequest createProductRequest() {
+    CreateProductRequest request = new CreateProductRequest();
+    request.setName("Coffee");
+    request.setDescription("Ground coffee");
+    request.setPrice(new BigDecimal("12.50"));
+    request.setQuantity(20);
+    return request;
+  }
 
-    public static UpdateProductRequest updateProductRequest() {
-        UpdateProductRequest request = new UpdateProductRequest();
-        request.setName("Coffee Premium");
-        request.setDescription("Premium ground coffee");
-        request.setPrice(new BigDecimal("16.00"));
-        request.setQuantity(10);
-        return request;
-    }
+  public static UpdateProductRequest updateProductRequest() {
+    UpdateProductRequest request = new UpdateProductRequest();
+    request.setName("Coffee Premium");
+    request.setDescription("Premium ground coffee");
+    request.setPrice(new BigDecimal("16.00"));
+    request.setQuantity(10);
+    return request;
+  }
 
-    public static User user() {
-        return User.builder()
-                .id(UUID.fromString("11111111-1111-1111-1111-111111111111"))
-                .firstName("Ana")
-                .lastName("Lopez")
-                .email("ana@example.com")
-                .phone("3001112233")
-                .password("StrongPass1")
-                .role(UserRole.CLIENT)
-                .active(true)
-                .build();
-    }
+  public static User user() {
+    return User.builder()
+            .id(UUID.fromString("11111111-1111-1111-1111-111111111111"))
+            .firstName("Ana")
+            .lastName("Lopez")
+            .email("ana@example.com")
+            .phone("3001112233")
+            .password("StrongPass1")
+            .role(UserRole.CLIENT)
+            .active(true)
+            .build();
+  }
 
-    public static UserEntity userEntity() {
-        return UserEntity.builder()
-                .id(UUID.fromString("11111111-1111-1111-1111-111111111111"))
-                .firstName("Ana")
-                .lastName("Lopez")
-                .email("ana@example.com")
-                .phone("3001112233")
-                .password("$2a$10$hash")
-                .role(UserRole.CLIENT)
-                .active(true)
-                .build();
-    }
+  public static UserEntity userEntity() {
+    return UserEntity.builder()
+            .id(UUID.fromString("11111111-1111-1111-1111-111111111111"))
+            .firstName("Ana")
+            .lastName("Lopez")
+            .email("ana@example.com")
+            .phone("3001112233")
+            .password("$2a$10$hash")
+            .role(UserRole.CLIENT)
+            .active(true)
+            .build();
+  }
 
-    public static CreateUserRequest createUserRequest() {
-        CreateUserRequest request = new CreateUserRequest();
-        request.setFirstName("Ana");
-        request.setLastName("Lopez");
-        request.setEmail("ana@example.com");
-        request.setPhone("3001112233");
-        request.setPassword("StrongPass1");
-        request.setRole(UserRole.CLIENT);
-        return request;
-    }
+  public static CreateUserRequest createUserRequest() {
+    CreateUserRequest request = new CreateUserRequest();
+    request.setFirstName("Ana");
+    request.setLastName("Lopez");
+    request.setEmail("ana@example.com");
+    request.setPhone("3001112233");
+    request.setPassword("StrongPass1");
+    request.setRole(UserRole.CLIENT);
+    return request;
+  }
 
-    public static UpdateUserRequest updateUserRequest() {
-        UpdateUserRequest request = new UpdateUserRequest();
-        request.setFirstName("Ana Maria");
-        request.setLastName("Lopez Ruiz");
-        request.setPhone("3004445566");
-        return request;
-    }
+  public static UpdateUserRequest updateUserRequest() {
+    UpdateUserRequest request = new UpdateUserRequest();
+    request.setFirstName("Ana Maria");
+    request.setLastName("Lopez Ruiz");
+    request.setPhone("3004445566");
+    return request;
+  }
 
-    public static Order order() {
-        return Order.builder()
-                .id(9L)
-                .userId(UUID.fromString("11111111-1111-1111-1111-111111111111"))
-                .totalPrice(new BigDecimal("25.00"))
-                .orderStatus(OrderStatus.APPROVED)
-                .orderProducts(List.of(orderProduct()))
-                .active(true)
-                .build();
-    }
+  public static Order order() {
+    return Order.builder()
+            .id(9L)
+            .userId(UUID.fromString("11111111-1111-1111-1111-111111111111"))
+            .totalPrice(new BigDecimal("25.00"))
+            .orderStatus(OrderStatus.APPROVED)
+            .orderProducts(List.of(orderProduct()))
+            .active(true)
+            .build();
+  }
 
-    public static OrderProduct orderProduct() {
-        return OrderProduct.builder()
-                .id(2L)
-                .productId("1")
-                .quantity(2)
-                .unitPrice(new BigDecimal("12.50"))
-                .build();
-    }
+  public static OrderProduct orderProduct() {
+    return OrderProduct.builder()
+            .id(2L)
+            .productId("1")
+            .quantity(2)
+            .unitPrice(new BigDecimal("12.50"))
+            .build();
+  }
 
-    public static OrderEntity orderEntity() {
-        UserEntity user = userEntity();
-        OrderEntity order = OrderEntity.builder()
-                .id(9L)
-                .user(user)
-                .totalPrice(new BigDecimal("25.00"))
-                .orderStatus(OrderStatus.APPROVED)
-                .active(true)
-                .build();
-        OrderProductEntity item = OrderProductEntity.builder()
-                .id(2L)
-                .order(order)
-                .product(productEntity())
-                .quantity(2)
-                .unitPrice(new BigDecimal("12.50"))
-                .build();
-        order.setOrderProducts(List.of(item));
-        return order;
-    }
+  public static OrderEntity orderEntity() {
+    UserEntity user = userEntity();
+    OrderEntity order = OrderEntity.builder()
+            .id(9L)
+            .user(user)
+            .totalPrice(new BigDecimal("25.00"))
+            .orderStatus(OrderStatus.APPROVED)
+            .active(true)
+            .build();
+    OrderProductEntity item = OrderProductEntity.builder()
+            .id(2L)
+            .order(order)
+            .product(productEntity())
+            .quantity(2)
+            .unitPrice(new BigDecimal("12.50"))
+            .build();
+    order.setOrderProducts(List.of(item));
+    return order;
+  }
 
-    public static CreateOrderRequest createOrderRequest() {
-        AddOrderItemRequest item = new AddOrderItemRequest();
-        item.setProductId(1L);
-        item.setQuantity(2);
-        CreateOrderRequest request = new CreateOrderRequest();
-        request.setItems(List.of(item));
-        return request;
-    }
+  public static CreateOrderRequest createOrderRequest() {
+    AddOrderItemRequest item = new AddOrderItemRequest();
+    item.setProductId(1L);
+    item.setQuantity(2);
+    CreateOrderRequest request = new CreateOrderRequest();
+    request.setItems(List.of(item));
+    return request;
+  }
 }
 ```
 
@@ -715,7 +717,8 @@ class ProductRepositoryTest {
 package org.java_avanzado.taller.persistence.repository;
 
 import static org.junit.jupiter.api.Assertions.*;
-import org.java_avanzado.taller.domain.model.UserRole;
+
+import org.java_avanzado.taller.domain.model.enums.UserRole;
 import org.java_avanzado.taller.persistence.entity.UserEntity;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -724,20 +727,21 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 @DataJpaTest
 class UserRepositoryTest {
-    @Autowired UserRepository repository;
+  @Autowired
+  UserRepository repository;
 
-    @Nested
-    class given_usersInDatabase {
-        @Test
-        void when_findByEmail_then_returnsMatchingUser() {
-            repository.save(UserEntity.builder().firstName("Ana").lastName("Lopez")
-                    .email("ana@example.com").password("x").role(UserRole.CLIENT).active(true).build());
+  @Nested
+  class given_usersInDatabase {
+    @Test
+    void when_findByEmail_then_returnsMatchingUser() {
+      repository.save(UserEntity.builder().firstName("Ana").lastName("Lopez")
+              .email("ana@example.com").password("x").role(UserRole.CLIENT).active(true).build());
 
-            var found = repository.findByEmail("ana@example.com");
-            assertTrue(found.isPresent());
-            assertEquals("Ana", found.get().getFirstName());
-        }
+      var found = repository.findByEmail("ana@example.com");
+      assertTrue(found.isPresent());
+      assertEquals("Ana", found.get().getFirstName());
     }
+  }
 }
 ```
 
@@ -746,10 +750,9 @@ class UserRepositoryTest {
 package org.java_avanzado.taller.persistence.repository;
 
 import static org.junit.jupiter.api.Assertions.*;
+
 import java.math.BigDecimal;
-import java.util.UUID;
-import org.java_avanzado.taller.domain.model.OrderStatus;
-import org.java_avanzado.taller.domain.model.UserRole;
+
 import org.java_avanzado.taller.persistence.entity.OrderEntity;
 import org.java_avanzado.taller.persistence.entity.UserEntity;
 import org.junit.jupiter.api.Nested;
@@ -759,22 +762,24 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 @DataJpaTest
 class OrderRepositoryTest {
-    @Autowired OrderRepository orderRepository;
-    @Autowired UserRepository userRepository;
+    @Autowired
+    OrderRepository orderRepository;
+    @Autowired
+    UserRepository userRepository;
 
     @Nested
     class given_ordersForDifferentUsers {
         @Test
         void when_findAllByUserId_then_returnsOnlyUsersOrders() {
             UserEntity user1 = userRepository.save(UserEntity.builder().firstName("Ana").lastName("Lopez")
-                    .email("ana@example.com").password("x").role(UserRole.CLIENT).active(true).build());
+                    .email("ana@example.com").password("x").role(org.java_avanzado.taller.domain.model.enums.UserRole.CLIENT).active(true).build());
             UserEntity user2 = userRepository.save(UserEntity.builder().firstName("Luis").lastName("Diaz")
-                    .email("luis@example.com").password("x").role(UserRole.CLIENT).active(true).build());
+                    .email("luis@example.com").password("x").role(org.java_avanzado.taller.domain.model.enums.UserRole.CLIENT).active(true).build());
 
             orderRepository.save(OrderEntity.builder().user(user1).totalPrice(new BigDecimal("15.00"))
-                    .orderStatus(OrderStatus.APPROVED).active(true).build());
+                    .orderStatus(org.java_avanzado.taller.domain.model.enums.OrderStatus.APPROVED).active(true).build());
             orderRepository.save(OrderEntity.builder().user(user2).totalPrice(new BigDecimal("20.00"))
-                    .orderStatus(OrderStatus.APPROVED).active(true).build());
+                    .orderStatus(org.java_avanzado.taller.domain.model.enums.OrderStatus.APPROVED).active(true).build());
 
             assertEquals(1, orderRepository.findAllByUserId(user1.getId()).size());
         }
@@ -922,8 +927,11 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import java.util.Map;
 import java.util.UUID;
+
+import org.java_avanzado.taller.domain.model.enums.OrderStatus;
 import org.java_avanzado.taller.service.OrderService;
 import org.java_avanzado.taller.service.ProductService;
 import org.java_avanzado.taller.support.TestDataFactory;
@@ -939,27 +947,31 @@ import org.springframework.test.web.servlet.MockMvc;
 @WebMvcTest(OrderController.class)
 @AutoConfigureMockMvc(addFilters = false)
 class OrderControllerTest {
-    @Autowired MockMvc mockMvc;
-    @MockBean OrderService orderService;
-    @MockBean ProductService productService;
-    @MockBean OrderMapper orderMapper;
+  @Autowired
+  MockMvc mockMvc;
+  @MockBean
+  OrderService orderService;
+  @MockBean
+  ProductService productService;
+  @MockBean
+  OrderMapper orderMapper;
 
-    @Test
-    void given_validOrderRequest_when_createOrder_then_returns201() throws Exception {
-        UUID userId = UUID.fromString("11111111-1111-1111-1111-111111111111");
-        when(orderService.createOrder(any(UUID.class), any())).thenReturn(TestDataFactory.order());
-        when(productService.getActiveProduct(1L)).thenReturn(TestDataFactory.product());
-        when(orderMapper.fromOrderToResponse(any(), any(Map.class))).thenReturn(
-                org.java_avanzado.taller.controller.dto.response.OrderResponse.builder()
-                        .id(9L).status(org.java_avanzado.taller.domain.model.OrderStatus.APPROVED)
-                        .totalPrice(new java.math.BigDecimal("25.00")).build());
+  @Test
+  void given_validOrderRequest_when_createOrder_then_returns201() throws Exception {
+    UUID userId = UUID.fromString("11111111-1111-1111-1111-111111111111");
+    when(orderService.createOrder(any(UUID.class), any())).thenReturn(TestDataFactory.order());
+    when(productService.getActiveProduct(1L)).thenReturn(TestDataFactory.product());
+    when(orderMapper.fromOrderToResponse(any(), any(Map.class))).thenReturn(
+            org.java_avanzado.taller.controller.dto.response.OrderResponse.builder()
+                    .id(9L).status(org.java_avanzado.taller.domain.model.enums.OrderStatus.APPROVED)
+                    .totalPrice(new java.math.BigDecimal("25.00")).build());
 
-        mockMvc.perform(post("/api/orders/user/" + userId)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"items\":[{\"productId\":1,\"quantity\":2}]}"))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.id").value(9));
-    }
+    mockMvc.perform(post("/api/orders/user/" + userId)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content("{\"items\":[{\"productId\":1,\"quantity\":2}]}"))
+            .andExpect(status().isCreated())
+            .andExpect(jsonPath("$.id").value(9));
+  }
 }
 ```
 
@@ -1102,9 +1114,11 @@ package org.java_avanzado.taller.config;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import java.util.List;
 import java.util.Optional;
-import org.java_avanzado.taller.domain.model.UserRole;
+
+import org.java_avanzado.taller.domain.model.enums.UserRole;
 import org.java_avanzado.taller.persistence.entity.UserEntity;
 import org.java_avanzado.taller.persistence.repository.UserRepository;
 import org.java_avanzado.taller.service.JwtService;
@@ -1119,49 +1133,54 @@ import org.springframework.test.web.servlet.MockMvc;
 @SpringBootTest
 @AutoConfigureMockMvc
 class SecurityConfigIntegrationTest {
-    @Autowired MockMvc mockMvc;
+  @Autowired
+  MockMvc mockMvc;
 
-    @MockBean JwtService jwtService;
-    @MockBean UserRepository userRepository;
+  @MockBean
+  JwtService jwtService;
+  @MockBean
+  UserRepository userRepository;
 
-    @MockBean org.java_avanzado.taller.service.ProductService productService;
-    @MockBean org.java_avanzado.taller.utils.mapper.ProductMapper productMapper;
+  @MockBean
+  org.java_avanzado.taller.service.ProductService productService;
+  @MockBean
+  org.java_avanzado.taller.utils.mapper.ProductMapper productMapper;
 
-    @Nested
-    class given_noToken {
-        @Test
-        void when_accessProtectedEndpoint_then_returns401() throws Exception {
-            mockMvc.perform(get("/api/products"))
-                    .andExpect(status().isUnauthorized());
-        }
+  @Nested
+  class given_noToken {
+    @Test
+    void when_accessProtectedEndpoint_then_returns401() throws Exception {
+      mockMvc.perform(get("/api/products"))
+              .andExpect(status().isUnauthorized());
     }
+  }
 
-    @Nested
-    class given_invalidToken {
-        @Test
-        void when_accessProtectedEndpoint_then_returns401() throws Exception {
-            when(jwtService.extractUsername("bad-token")).thenReturn(null);
-            mockMvc.perform(get("/api/products").header("Authorization", "Bearer bad-token"))
-                    .andExpect(status().isUnauthorized());
-        }
+  @Nested
+  class given_invalidToken {
+    @Test
+    void when_accessProtectedEndpoint_then_returns401() throws Exception {
+      when(jwtService.extractUsername("bad-token")).thenReturn(null);
+      mockMvc.perform(get("/api/products").header("Authorization", "Bearer bad-token"))
+              .andExpect(status().isUnauthorized());
     }
+  }
 
-    @Nested
-    class given_validToken {
-        @Test
-        void when_accessProtectedEndpoint_then_returns200() throws Exception {
-            when(jwtService.extractUsername("good-token")).thenReturn("ana@example.com");
-            when(jwtService.isTokenValid("good-token", "ana@example.com")).thenReturn(true);
-            when(userRepository.findByEmail("ana@example.com")).thenReturn(Optional.of(
-                    UserEntity.builder().email("ana@example.com").password("x").firstName("Ana")
-                            .lastName("Lopez").role(UserRole.CLIENT).active(true).build()));
-            when(productService.getAllActiveProducts()).thenReturn(List.of());
-            when(productMapper.fromProductListToSummaryList(List.of())).thenReturn(List.of());
+  @Nested
+  class given_validToken {
+    @Test
+    void when_accessProtectedEndpoint_then_returns200() throws Exception {
+      when(jwtService.extractUsername("good-token")).thenReturn("ana@example.com");
+      when(jwtService.isTokenValid("good-token", "ana@example.com")).thenReturn(true);
+      when(userRepository.findByEmail("ana@example.com")).thenReturn(Optional.of(
+              UserEntity.builder().email("ana@example.com").password("x").firstName("Ana")
+                      .lastName("Lopez").role(UserRole.CLIENT).active(true).build()));
+      when(productService.getAllActiveProducts()).thenReturn(List.of());
+      when(productMapper.fromProductListToSummaryList(List.of())).thenReturn(List.of());
 
-            mockMvc.perform(get("/api/products").header("Authorization", "Bearer good-token"))
-                    .andExpect(status().isOk());
-        }
+      mockMvc.perform(get("/api/products").header("Authorization", "Bearer good-token"))
+              .andExpect(status().isOk());
     }
+  }
 }
 ```
 

@@ -1,4 +1,4 @@
-package org.java_avanzado.taller.domain.model;
+package org.java_avanzado.taller.domain.model.enums;
 
 import lombok.Getter;
 

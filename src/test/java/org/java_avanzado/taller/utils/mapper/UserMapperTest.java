@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.UUID;
 import org.java_avanzado.taller.domain.model.User;
-import org.java_avanzado.taller.domain.model.UserRole;
+import org.java_avanzado.taller.domain.model.enums.UserRole;
 import org.java_avanzado.taller.support.TestDataFactory;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;

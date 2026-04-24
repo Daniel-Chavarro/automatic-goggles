@@ -135,7 +135,7 @@ public class CreateOrderRequest {
 package org.java_avanzado.taller.controller.dto.request.update;
 
 import lombok.Data;
-import org.java_avanzado.taller.domain.model.OrderStatus;
+import org.java_avanzado.taller.domain.model.enums.OrderStatus;
 
 @Data
 public class UpdateOrderRequest {
@@ -209,7 +209,7 @@ package org.java_avanzado.taller.controller.dto.response;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 import lombok.Data;
-import org.java_avanzado.taller.domain.model.UserRole;
+import org.java_avanzado.taller.domain.model.enums.UserRole;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -218,7 +218,7 @@ import java.util.UUID;
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserResponse {
-    
+
     private UUID id;
     private String firstName;
     private String lastName;
@@ -358,7 +358,6 @@ package org.java_avanzado.taller.controller.dto.response;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 import lombok.Data;
-import org.java_avanzado.taller.domain.model.OrderStatus;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -369,11 +368,11 @@ import java.util.UUID;
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class OrderResponse {
-    
+
     private Long id;
     private UUID userId;
     private BigDecimal totalPrice;
-    private OrderStatus status;
+    private org.java_avanzado.taller.domain.model.enums.OrderStatus status;
     private List<OrderItemResponse> items;
     private boolean active;
     private LocalDateTime createdAt;
@@ -387,7 +386,7 @@ package org.java_avanzado.taller.controller.dto.response;
 
 import lombok.Builder;
 import lombok.Data;
-import org.java_avanzado.taller.domain.model.OrderStatus;
+import org.java_avanzado.taller.domain.model.enums.OrderStatus;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -395,7 +394,7 @@ import java.time.LocalDateTime;
 @Data
 @Builder
 public class OrderSummaryResponse {
-    
+
     private Long id;
     private BigDecimal totalPrice;
     private OrderStatus status;

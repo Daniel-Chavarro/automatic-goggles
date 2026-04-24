@@ -6,10 +6,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.java_avanzado.taller.domain.model.OrderStatus;
+import org.java_avanzado.taller.domain.model.enums.OrderStatus;
 
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.List;
 
 /**

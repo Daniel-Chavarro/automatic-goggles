@@ -3,7 +3,7 @@ package org.java_avanzado.taller.persistence.repository;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.java_avanzado.taller.support.AuditTestUtils.withAudit;
 
-import org.java_avanzado.taller.domain.model.UserRole;
+import org.java_avanzado.taller.domain.model.enums.UserRole;
 import org.java_avanzado.taller.persistence.entity.UserEntity;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;

@@ -2,6 +2,7 @@ package org.java_avanzado.taller.domain.model;
 
 import lombok.Builder;
 import lombok.Data;
+import org.java_avanzado.taller.domain.model.enums.OrderStatus;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;

@@ -11,10 +11,10 @@ import org.java_avanzado.taller.controller.dto.request.update.UpdateProductReque
 import org.java_avanzado.taller.controller.dto.request.update.UpdateUserRequest;
 import org.java_avanzado.taller.domain.model.Order;
 import org.java_avanzado.taller.domain.model.OrderProduct;
-import org.java_avanzado.taller.domain.model.OrderStatus;
+import org.java_avanzado.taller.domain.model.enums.OrderStatus;
 import org.java_avanzado.taller.domain.model.Product;
 import org.java_avanzado.taller.domain.model.User;
-import org.java_avanzado.taller.domain.model.UserRole;
+import org.java_avanzado.taller.domain.model.enums.UserRole;
 import org.java_avanzado.taller.persistence.entity.OrderEntity;
 import org.java_avanzado.taller.persistence.entity.OrderProductEntity;
 import org.java_avanzado.taller.persistence.entity.ProductEntity;

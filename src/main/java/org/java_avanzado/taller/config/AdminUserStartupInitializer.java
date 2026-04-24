@@ -1,7 +1,7 @@
 package org.java_avanzado.taller.config;
 
 import lombok.RequiredArgsConstructor;
-import org.java_avanzado.taller.domain.model.UserRole;
+import org.java_avanzado.taller.domain.model.enums.UserRole;
 import org.java_avanzado.taller.persistence.entity.UserEntity;
 import org.java_avanzado.taller.persistence.repository.UserRepository;
 import org.slf4j.Logger;

@@ -19,7 +19,7 @@ import org.java_avanzado.taller.config.JwtAuthenticationFilter;
 import org.java_avanzado.taller.controller.dto.request.create.CreateOrderRequest;
 import org.java_avanzado.taller.controller.dto.response.OrderItemResponse;
 import org.java_avanzado.taller.controller.dto.response.OrderResponse;
-import org.java_avanzado.taller.domain.model.OrderStatus;
+import org.java_avanzado.taller.domain.model.enums.OrderStatus;
 import org.java_avanzado.taller.service.OrderService;
 import org.java_avanzado.taller.service.ProductService;
 import org.java_avanzado.taller.support.TestDataFactory;
