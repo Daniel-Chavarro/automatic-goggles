@@ -9,6 +9,7 @@ import org.java_avanzado.taller.domain.model.User;
 import org.java_avanzado.taller.persistence.entity.UserEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingConstants;
+import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 
 import java.util.List;
@@ -20,6 +21,8 @@ public interface UserMapper {
     // Entity <-> Domain
     User fromUserEntityToDomain(UserEntity entity);
     UserEntity fromUserToEntity(User domain);
+
+    void updateEntityFromDomain(User domain, @MappingTarget UserEntity entity);
 
     // Create Request -> Domain
     User fromCreateUserRequestToDomain(CreateUserRequest request);

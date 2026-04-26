@@ -9,6 +9,7 @@ import org.java_avanzado.taller.persistence.entity.ProductEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
+import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 
 import java.util.List;
@@ -22,6 +23,9 @@ public interface ProductMapper {
 
     @Mapping(source = "quantity", target = "stockQuantity")
     ProductEntity fromProductToEntity(Product domain);
+
+    @Mapping(source = "quantity", target = "stockQuantity")
+    void updateEntityFromDomain(Product domain, @MappingTarget ProductEntity entity);
 
     // Create Request -> Domain
     Product fromCreateProductRequestToDomain(CreateProductRequest request);
