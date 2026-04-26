@@ -1,6 +1,5 @@
 package org.java_avanzado.taller.security;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.java_avanzado.taller.domain.model.User;
 import org.java_avanzado.taller.domain.model.enums.UserRole;
@@ -16,7 +15,7 @@ import java.util.UUID;
 @Getter
 public class CustomUserDetails implements UserDetails {
 
-    private User user;
+    private final User user;
 
     public CustomUserDetails(User user) {
         Assert.notNull(user, "User must not be null");

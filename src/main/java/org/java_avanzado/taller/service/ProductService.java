@@ -2,8 +2,8 @@ package org.java_avanzado.taller.service;
 
 import lombok.RequiredArgsConstructor;
 import org.java_avanzado.taller.controller.dto.request.create.CreateProductRequest;
-import org.java_avanzado.taller.controller.dto.request.update.UpdateProductRequest;
 import org.java_avanzado.taller.controller.dto.request.filter.ProductFilterDto;
+import org.java_avanzado.taller.controller.dto.request.update.UpdateProductRequest;
 import org.java_avanzado.taller.domain.exception.ProductNotFoundException;
 import org.java_avanzado.taller.domain.model.Product;
 import org.java_avanzado.taller.persistence.entity.ProductEntity;
@@ -87,7 +87,7 @@ public class ProductService {
     /**
      * Updates an existing product with the provided values.
      *
-     * @param id identifier of the product to update
+     * @param id      identifier of the product to update
      * @param product product data used to update the target entity
      * @return the updated product
      * @throws ProductNotFoundException when no product exists with the provided identifier
@@ -166,7 +166,7 @@ public class ProductService {
     /**
      * Legacy overload that updates a product directly from request DTO data.
      *
-     * @param id identifier of the product to update
+     * @param id      identifier of the product to update
      * @param request request payload with partial update values
      * @return the updated product
      * @throws ProductNotFoundException when no product exists with the provided identifier

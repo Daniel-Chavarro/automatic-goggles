@@ -10,15 +10,16 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.java_avanzado.taller.controller.dto.request.create.CreateProductRequest;
-import org.java_avanzado.taller.controller.dto.request.update.UpdateProductRequest;
-import org.java_avanzado.taller.controller.dto.response.ProductResponse;
 import org.java_avanzado.taller.controller.dto.request.filter.ProductFilterDto;
+import org.java_avanzado.taller.controller.dto.request.update.UpdateProductRequest;
 import org.java_avanzado.taller.controller.dto.response.PaginatedResponse;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import org.java_avanzado.taller.controller.dto.response.ProductResponse;
+import org.java_avanzado.taller.controller.dto.response.ProductSummaryResponse;
 import org.java_avanzado.taller.domain.model.Product;
 import org.java_avanzado.taller.service.ProductService;
 import org.java_avanzado.taller.utils.mapper.ProductMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,10 +30,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import org.java_avanzado.taller.controller.dto.response.ProductSummaryResponse;
-
-import java.util.List;
-
 @Tag(name = "Products", description = "Product catalog management operations")
 @RestController
 @RequestMapping("/api/products")
@@ -42,7 +39,10 @@ public class ProductController {
     private final ProductService productService;
     private final ProductMapper productMapper;
 
-    @Operation(summary = "List all products", description = "Returns a paginated list of active products with optional filtering by name, price range, and active status.")
+    @Operation(summary = "List all products",
+            description = "Returns a paginated list of active products with optional filtering by name, " +
+                    "price range, and active status." +
+                    "\nRequires ADMIN OR CLIENT role")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Products retrieved successfully"),
             @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
@@ -57,7 +57,9 @@ public class ProductController {
         return ResponseEntity.ok(PaginatedResponse.from(responsePage));
     }
 
-    @Operation(summary = "Get product by ID", description = "Returns a single active product by its unique identifier.")
+    @Operation(summary = "Get product by ID",
+            description = "Returns a single active product by its unique identifier." +
+                    "\nRequires ADMIN OR CLIENT role")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Product found"),
             @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
@@ -70,7 +72,10 @@ public class ProductController {
         return ResponseEntity.ok(productMapper.fromProductToResponse(productService.getActiveProduct(id)));
     }
 
-    @Operation(summary = "Create a new product", description = "Creates a new product with the provided information including name, description, price, and initial stock quantity.")
+    @Operation(summary = "Create a new product",
+            description = "Creates a new product with the provided information including name, " +
+                    "description, price, and initial stock quantity." +
+                    "\nRequires ADMIN role")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Product created successfully"),
             @ApiResponse(responseCode = "400", description = "Invalid request data", content = @Content),
@@ -88,7 +93,9 @@ public class ProductController {
         return ResponseEntity.ok(productMapper.fromProductToResponse(productService.createProduct(product)));
     }
 
-    @Operation(summary = "Update a product", description = "Partially updates an existing product. Only provided fields will be updated.")
+    @Operation(summary = "Update a product", description = "Partially updates an existing product. " +
+            "Only provided fields will be updated." +
+            "\nRequires ADMIN role")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Product updated successfully"),
             @ApiResponse(responseCode = "400", description = "Invalid request data", content = @Content),
@@ -108,7 +115,10 @@ public class ProductController {
         return ResponseEntity.ok(productMapper.fromProductToResponse(productService.updateProduct(id, product)));
     }
 
-    @Operation(summary = "Delete a product", description = "Soft-deletes a product by marking it as inactive. The product will no longer appear in active product listings.")
+    @Operation(summary = "Delete a product",
+            description = "Soft-deletes a product by marking it as inactive. " +
+                    "The product will no longer appear in active product listings." +
+                    "\nRequires ADMIN role")
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "Product deleted successfully"),
             @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),

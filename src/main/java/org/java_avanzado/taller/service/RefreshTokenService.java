@@ -18,16 +18,15 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class RefreshTokenService {
-    @Value("${jwt.refresh.expiration:604800000}") // 7 days
-    private Long refreshTokenDurationMs;
-
     private final RefreshTokenRepository refreshTokenRepository;
     private final UserRepository userRepository;
+    @Value("${jwt.refresh.expiration:604800000}") // 7 days
+    private Long refreshTokenDurationMs;
 
     @Transactional
     public RefreshTokenEntity createRefreshToken(UUID userId) { // Use UUID for userId!
         UserEntity user = userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found"));
-        
+
         // Delete any existing refresh tokens for the user
         refreshTokenRepository.deleteByUser(user);
 

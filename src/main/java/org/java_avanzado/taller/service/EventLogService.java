@@ -2,18 +2,18 @@ package org.java_avanzado.taller.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.java_avanzado.taller.controller.dto.request.filter.AuditFilterDto;
 import org.java_avanzado.taller.domain.model.EventLog;
 import org.java_avanzado.taller.domain.model.enums.EventType;
 import org.java_avanzado.taller.persistence.entity.EventLogEntity;
 import org.java_avanzado.taller.persistence.repository.EventLogRepository;
+import org.java_avanzado.taller.persistence.specification.AuditSpecifications;
 import org.java_avanzado.taller.utils.mapper.EventLogMapper;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.java_avanzado.taller.controller.dto.request.filter.AuditFilterDto;
-import org.java_avanzado.taller.persistence.specification.AuditSpecifications;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;

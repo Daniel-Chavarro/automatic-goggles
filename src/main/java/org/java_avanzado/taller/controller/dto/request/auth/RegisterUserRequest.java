@@ -50,11 +50,11 @@ public class RegisterUserRequest {
      * Account password.
      * Must include at least one digit, one lowercase letter, and one uppercase letter.
      */
-    @Schema(description = "Account password (must contain digit, lowercase, and uppercase)", 
-           example = "Password123", 
-           minLength = 8, 
-           maxLength = 255,
-           pattern = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z]).*$")
+    @Schema(description = "Account password (must contain digit, lowercase, and uppercase)",
+            example = "Password123",
+            minLength = 8,
+            maxLength = 255,
+            pattern = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z]).*$")
     @NotNull
     @Size(min = 8, max = 255, message = "Password must be between 8 and 255 characters")
     @Pattern(regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z]).*$",
