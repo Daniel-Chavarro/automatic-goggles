@@ -1,6 +1,7 @@
 package org.java_avanzado.taller.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.java_avanzado.taller.controller.dto.request.create.CreateProductRequest;
 import org.java_avanzado.taller.controller.dto.request.filter.ProductFilterDto;
 import org.java_avanzado.taller.controller.dto.request.update.UpdateProductRequest;
@@ -14,6 +15,7 @@ import org.java_avanzado.taller.utils.mapper.ProductMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,6 +35,7 @@ import static org.java_avanzado.taller.utils.validators.AuxiliaryMethods.modify;
  */
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ProductService {
     private final ProductRepository productRepository;
     private final ProductMapper productMapper;
@@ -130,27 +133,13 @@ public class ProductService {
     }
 
     /**
-     * Returns all active products.
-     *
-     * @return list of active products
-     * @deprecated use repository/domain-based active queries instead of loading all products in memory
-     */
-    @Transactional(readOnly = true)
-    @Deprecated
-    public List<Product> getAllActiveProducts() {
-        return productRepository.findAll().stream()
-                .filter(ProductEntity::isActive)
-                .map(productMapper::fromProductEntityToDomain)
-                .collect(Collectors.toList());
-    }
-
-    /**
      * Restocks products based on the provided order products list.
      * For each order product, increases the product stock by the quantity specified.
      *
      * @param orderProducts list of order products containing productId and quantity to restore
      */
     @Transactional
+    @Async("taskExecutor")
     public void restockProducts(List<OrderProduct> orderProducts) {
         Map<Long, Integer> restockQuantities = new HashMap<>();
         
@@ -159,69 +148,25 @@ public class ProductService {
         }
 
         for (Map.Entry<Long, Integer> entry : restockQuantities.entrySet()) {
+            ProductEntity entity;
             Long productId = entry.getKey();
             int quantityToRestock = entry.getValue();
 
-            ProductEntity entity = productRepository.findById(productId)
-                    .orElseThrow(() -> new ProductNotFoundException("Product not found with id: " + productId));
+            try {
+                entity = productRepository.findById(productId)
+                        .orElseThrow(() -> new ProductNotFoundException("Product not found with id: " + productId));
+            } catch (ProductNotFoundException e) {
+
+                log.error("Failed to restock product with id {}: {}", productId, e.getMessage());
+                continue;
+            }
+
 
             entity.setStockQuantity(entity.getStockQuantity() + quantityToRestock);
             productRepository.save(entity);
         }
     }
 
-    /**
-     * Legacy overload that creates a product directly from request DTO data.
-     *
-     * @param request request payload used to build the product
-     * @return the persisted product
-     * @deprecated use {@link #createProduct(Product)} after mapping in the controller layer
-     */
-    @Transactional
-    @Deprecated(forRemoval = true)
-    public Product createProduct(CreateProductRequest request) {
-        Product product = Product.builder()
-                .name(request.getName())
-                .description(request.getDescription())
-                .price(request.getPrice())
-                .quantity(request.getQuantity())
-                .active(true)
-                .build();
-
-        ProductEntity entity = productMapper.fromProductToEntity(product);
-        return productMapper.fromProductEntityToDomain(productRepository.save(entity));
-    }
-
-    /**
-     * Legacy overload that updates a product directly from request DTO data.
-     *
-     * @param id      identifier of the product to update
-     * @param request request payload with partial update values
-     * @return the updated product
-     * @throws ProductNotFoundException when no product exists with the provided identifier
-     * @deprecated use {@link #updateProduct(Long, Product)} after mapping in the controller layer
-     */
-    @Transactional
-    @Deprecated(forRemoval = true)
-    public Product updateProduct(Long id, UpdateProductRequest request) {
-        ProductEntity entity = productRepository.findById(id)
-                .orElseThrow(() -> new ProductNotFoundException("Product not found"));
-
-        if (request.getName() != null) {
-            entity.setName(request.getName());
-        }
-        if (request.getDescription() != null) {
-            entity.setDescription(request.getDescription());
-        }
-        if (request.getPrice() != null) {
-            entity.setPrice(request.getPrice());
-        }
-        if (request.getQuantity() != null) {
-            entity.setStockQuantity(request.getQuantity());
-        }
-
-        return productMapper.fromProductEntityToDomain(productRepository.save(entity));
-    }
 
     /**
      * Validates basic product constraints before persistence operations.
