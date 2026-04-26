@@ -7,6 +7,7 @@ import org.java_avanzado.taller.controller.dto.response.JwtAuthResponse;
 import org.java_avanzado.taller.domain.exception.UserNotFoundException;
 import org.java_avanzado.taller.domain.model.User;
 import org.java_avanzado.taller.domain.model.enums.UserRole;
+import org.java_avanzado.taller.persistence.entity.RefreshTokenEntity;
 import org.java_avanzado.taller.persistence.entity.UserEntity;
 import org.java_avanzado.taller.persistence.repository.UserRepository;
 import org.java_avanzado.taller.security.CustomUserDetails;
@@ -61,6 +62,7 @@ public class AuthService {
                 .build();
     }
 
+    @Transactional
     public JwtAuthResponse login(LoginUserRequest request) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
@@ -83,12 +85,12 @@ public class AuthService {
     }
 
     public JwtAuthResponse refresh(String refreshToken) {
-        refreshTokenService.findByToken(refreshToken)
-                .ifPresent(refreshTokenService::verifyExpiration);
+        RefreshTokenEntity refreshTokenEntity = refreshTokenService.findByToken(refreshToken)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid refresh token"));
 
-        String email = refreshTokenService.findByToken(refreshToken)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid refresh token"))
-                .getUser().getEmail();
+        refreshTokenService.verifyExpiration(refreshTokenEntity);
+
+        String email = refreshTokenEntity.getUser().getEmail();
 
         UserEntity user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException("User not found with email: " + email));
@@ -103,6 +105,7 @@ public class AuthService {
                 .build();
     }
 
+    @Transactional
     public void logout(String refreshToken) {
         refreshTokenService.deleteByToken(refreshToken);
     }
