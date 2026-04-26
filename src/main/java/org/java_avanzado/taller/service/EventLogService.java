@@ -6,6 +6,11 @@ import org.java_avanzado.taller.persistence.entity.EventLogEntity;
 import org.java_avanzado.taller.persistence.repository.EventLogRepository;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+import org.java_avanzado.taller.controller.dto.request.filter.AuditFilterDto;
+import org.java_avanzado.taller.persistence.specification.AuditSpecifications;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -40,5 +45,10 @@ public class EventLogService {
 
     public List<EventLogEntity> getAllLogs() {
         return eventLogRepository.findAll();
+    }
+
+    public Page<EventLogEntity> getLogs(AuditFilterDto filter, Pageable pageable) {
+        Specification<EventLogEntity> spec = AuditSpecifications.withFilter(filter);
+        return eventLogRepository.findAll(spec, pageable);
     }
 }

@@ -5,6 +5,12 @@ import org.java_avanzado.taller.domain.exception.BadCredentialsException;
 import org.java_avanzado.taller.domain.exception.InactiveUserException;
 import org.java_avanzado.taller.domain.exception.ProductNotFoundException;
 import org.java_avanzado.taller.domain.exception.UserNotFoundException;
+import org.java_avanzado.taller.domain.exception.EmailAlreadyExistsException;
+import org.java_avanzado.taller.domain.exception.OrderFinishedExeption;
+import org.java_avanzado.taller.domain.exception.OrderNotFoundException;
+import org.java_avanzado.taller.domain.exception.ProductAlreadyInOrderException;
+import org.java_avanzado.taller.domain.exception.ProductDisabledError;
+import org.java_avanzado.taller.domain.exception.TokenRefreshExpiredException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
@@ -48,6 +54,36 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(InactiveUserException.class)
     public ResponseEntity<Map<String, String>> handleInactiveUser(InactiveUserException ex) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("error", ex.getMessage()));
+    }
+
+    @ExceptionHandler(EmailAlreadyExistsException.class)
+    public ResponseEntity<Map<String, String>> handleEmailAlreadyExists(EmailAlreadyExistsException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("error", ex.getMessage()));
+    }
+
+    @ExceptionHandler(OrderNotFoundException.class)
+    public ResponseEntity<Map<String, String>> handleOrderNotFound(OrderNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", ex.getMessage()));
+    }
+
+    @ExceptionHandler(OrderFinishedExeption.class)
+    public ResponseEntity<Map<String, String>> handleOrderFinished(OrderFinishedExeption ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("error", ex.getMessage()));
+    }
+
+    @ExceptionHandler(ProductAlreadyInOrderException.class)
+    public ResponseEntity<Map<String, String>> handleProductAlreadyInOrder(ProductAlreadyInOrderException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("error", ex.getMessage()));
+    }
+
+    @ExceptionHandler(ProductDisabledError.class)
+    public ResponseEntity<Map<String, String>> handleProductDisabled(ProductDisabledError ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("error", ex.getMessage()));
+    }
+
+    @ExceptionHandler(TokenRefreshExpiredException.class)
+    public ResponseEntity<Map<String, String>> handleTokenRefreshExpired(TokenRefreshExpiredException ex) {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("error", ex.getMessage()));
     }
 

@@ -3,11 +3,16 @@ package org.java_avanzado.taller.service;
 import lombok.RequiredArgsConstructor;
 import org.java_avanzado.taller.controller.dto.request.create.CreateProductRequest;
 import org.java_avanzado.taller.controller.dto.request.update.UpdateProductRequest;
+import org.java_avanzado.taller.controller.dto.request.filter.ProductFilterDto;
 import org.java_avanzado.taller.domain.exception.ProductNotFoundException;
 import org.java_avanzado.taller.domain.model.Product;
 import org.java_avanzado.taller.persistence.entity.ProductEntity;
 import org.java_avanzado.taller.persistence.repository.ProductRepository;
+import org.java_avanzado.taller.persistence.specification.ProductSpecifications;
 import org.java_avanzado.taller.utils.mapper.ProductMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,6 +33,20 @@ import static org.java_avanzado.taller.utils.validators.AuxiliaryMethods.modify;
 public class ProductService {
     private final ProductRepository productRepository;
     private final ProductMapper productMapper;
+
+    /**
+     * Retrieves a paginated list of products based on the provided filter.
+     *
+     * @param filter   filter criteria
+     * @param pageable pagination and sorting information
+     * @return a page of products matching the filter
+     */
+    @Transactional(readOnly = true)
+    public Page<Product> getProducts(ProductFilterDto filter, Pageable pageable) {
+        Specification<ProductEntity> spec = ProductSpecifications.withFilter(filter);
+        Page<ProductEntity> entityPage = productRepository.findAll(spec, pageable);
+        return entityPage.map(productMapper::fromProductEntityToDomain);
+    }
 
     /**
      * Retrieves an active product by its identifier.

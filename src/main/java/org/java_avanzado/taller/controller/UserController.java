@@ -6,6 +6,10 @@ import org.java_avanzado.taller.controller.dto.request.create.CreateUserRequest;
 import org.java_avanzado.taller.controller.dto.request.update.UpdateUserRequest;
 import org.java_avanzado.taller.controller.dto.response.UserResponse;
 import org.java_avanzado.taller.controller.dto.response.UserSummaryResponse;
+import org.java_avanzado.taller.controller.dto.request.filter.UserFilterDto;
+import org.java_avanzado.taller.controller.dto.response.PaginatedResponse;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.java_avanzado.taller.domain.model.User;
 import org.java_avanzado.taller.service.UserService;
 import org.java_avanzado.taller.utils.mapper.UserMapper;
@@ -34,13 +38,18 @@ public class UserController {
     private final UserMapper userMapper;
 
     /**
-     * Returns all users.
+     * Returns all users with filtering and pagination.
      *
-     * @return a list of user summaries
+     * @param filter   filter criteria
+     * @param pageable pagination and sorting information
+     * @return a paginated list of user summaries
      */
     @GetMapping
-    public ResponseEntity<List<UserSummaryResponse>> getAllUsers() {
-        return ResponseEntity.ok(userMapper.fromUserListToSummaryList(userService.getAllUsers()));
+    public ResponseEntity<PaginatedResponse<UserSummaryResponse>> getAllUsers(
+            UserFilterDto filter, Pageable pageable) {
+        Page<User> users = userService.getUsers(filter, pageable);
+        Page<UserSummaryResponse> responsePage = users.map(userMapper::fromUserToSummary);
+        return ResponseEntity.ok(PaginatedResponse.from(responsePage));
     }
 
     /**

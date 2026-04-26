@@ -10,6 +10,11 @@ import org.java_avanzado.taller.domain.model.enums.UserRole;
 import org.java_avanzado.taller.persistence.entity.UserEntity;
 import org.java_avanzado.taller.persistence.repository.UserRepository;
 import org.java_avanzado.taller.utils.mapper.UserMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+import org.java_avanzado.taller.controller.dto.request.filter.UserFilterDto;
+import org.java_avanzado.taller.persistence.specification.UserSpecifications;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -114,6 +119,20 @@ public class UserService {
     public User getUserByEmail(String email) {
         return userRepository.findByEmail(email).map(userMapper::fromUserEntityToDomain)
                 .orElseThrow(() -> new UserNotFoundException("User not found with email: " + email));
+    }
+
+    /**
+     * Retrieves a paginated list of users based on the provided filter.
+     *
+     * @param filter   filter criteria
+     * @param pageable pagination and sorting information
+     * @return a page of users matching the filter
+     */
+    @Transactional(readOnly = true)
+    public Page<User> getUsers(UserFilterDto filter, Pageable pageable) {
+        Specification<UserEntity> spec = UserSpecifications.withFilter(filter);
+        Page<UserEntity> entityPage = userRepository.findAll(spec, pageable);
+        return entityPage.map(userMapper::fromUserEntityToDomain);
     }
 
     /**

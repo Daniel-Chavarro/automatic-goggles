@@ -2,6 +2,7 @@ package org.java_avanzado.taller.persistence.repository;
 
 import org.java_avanzado.taller.persistence.entity.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 import java.util.List;
 import java.util.Optional;
@@ -13,7 +14,7 @@ import java.util.UUID;
  * <p>Provides standard JPA CRUD operations and custom
  * queries for user search and retrieval.</p>
  */
-public interface UserRepository extends JpaRepository<UserEntity, UUID> {
+public interface UserRepository extends JpaRepository<UserEntity, UUID>, JpaSpecificationExecutor<UserEntity> {
     /**
      * Searches for users by first name pattern (case-insensitive).
      */

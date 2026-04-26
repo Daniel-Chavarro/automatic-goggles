@@ -10,6 +10,11 @@ import org.java_avanzado.taller.domain.model.Product;
 import org.java_avanzado.taller.persistence.entity.OrderEntity;
 import org.java_avanzado.taller.persistence.repository.OrderRepository;
 import org.java_avanzado.taller.utils.mapper.OrderMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+import org.java_avanzado.taller.controller.dto.request.filter.OrderFilterDto;
+import org.java_avanzado.taller.persistence.specification.OrderSpecifications;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -127,6 +132,20 @@ public class OrderService {
         orderMapper.updateEntityFromDomain(order, entity);
         OrderEntity updatedEntity = orderRepository.save(entity);
         return orderMapper.fromOrderEntityToDomain(updatedEntity);
+    }
+
+    /**
+     * Retrieves a paginated list of orders based on the provided filter.
+     *
+     * @param filter   filter criteria
+     * @param pageable pagination and sorting information
+     * @return a page of orders matching the filter
+     */
+    @Transactional(readOnly = true)
+    public Page<Order> getOrders(OrderFilterDto filter, Pageable pageable) {
+        Specification<OrderEntity> spec = OrderSpecifications.withFilter(filter);
+        Page<OrderEntity> entityPage = orderRepository.findAll(spec, pageable);
+        return entityPage.map(orderMapper::fromOrderEntityToDomain);
     }
 
     /**

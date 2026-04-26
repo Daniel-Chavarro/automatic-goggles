@@ -11,6 +11,10 @@ import org.java_avanzado.taller.domain.model.Order;
 import org.java_avanzado.taller.service.OrderService;
 import org.java_avanzado.taller.service.ProductService;
 import org.java_avanzado.taller.utils.mapper.OrderMapper;
+import org.java_avanzado.taller.controller.dto.request.filter.OrderFilterDto;
+import org.java_avanzado.taller.controller.dto.response.PaginatedResponse;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -52,26 +56,37 @@ public class OrderController {
     }
 
     /**
-     * Returns the orders associated with a user.
+     * Returns the orders associated with a user, with pagination and filtering.
      *
-     * @param userId user identifier
+     * @param userId   user identifier
+     * @param filter   filter criteria
+     * @param pageable pagination and sorting information
      * @return the user order summaries
      */
     @Transactional(readOnly = true)
     @GetMapping("/user/{userId}")
-    public ResponseEntity<List<OrderSummaryResponse>> getUserOrders(@PathVariable UUID userId) {
-        return ResponseEntity.ok(orderMapper.fromOrderListToSummaryList(orderService.getOrdersByUser(userId)));
+    public ResponseEntity<PaginatedResponse<OrderSummaryResponse>> getUserOrders(
+            @PathVariable UUID userId, OrderFilterDto filter, Pageable pageable) {
+        filter.setUserId(userId);
+        Page<Order> orders = orderService.getOrders(filter, pageable);
+        Page<OrderSummaryResponse> responsePage = orders.map(orderMapper::fromOrderToSummary);
+        return ResponseEntity.ok(PaginatedResponse.from(responsePage));
     }
 
     /**
-     * Returns all orders in the system.
+     * Returns all orders in the system, with pagination and filtering.
      *
+     * @param filter   filter criteria
+     * @param pageable pagination and sorting information
      * @return the order summaries
      */
     @Transactional(readOnly = true)
     @GetMapping
-    public ResponseEntity<List<OrderSummaryResponse>> getAllOrders() {
-        return ResponseEntity.ok(orderMapper.fromOrderListToSummaryList(orderService.getAllOrders()));
+    public ResponseEntity<PaginatedResponse<OrderSummaryResponse>> getAllOrders(
+            OrderFilterDto filter, Pageable pageable) {
+        Page<Order> orders = orderService.getOrders(filter, pageable);
+        Page<OrderSummaryResponse> responsePage = orders.map(orderMapper::fromOrderToSummary);
+        return ResponseEntity.ok(PaginatedResponse.from(responsePage));
     }
 
     /**

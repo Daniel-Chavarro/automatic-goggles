@@ -5,7 +5,10 @@ import lombok.RequiredArgsConstructor;
 import org.java_avanzado.taller.controller.dto.request.create.CreateProductRequest;
 import org.java_avanzado.taller.controller.dto.request.update.UpdateProductRequest;
 import org.java_avanzado.taller.controller.dto.response.ProductResponse;
-import org.java_avanzado.taller.controller.dto.response.ProductSummaryResponse;
+import org.java_avanzado.taller.controller.dto.request.filter.ProductFilterDto;
+import org.java_avanzado.taller.controller.dto.response.PaginatedResponse;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.java_avanzado.taller.domain.model.Product;
 import org.java_avanzado.taller.service.ProductService;
 import org.java_avanzado.taller.utils.mapper.ProductMapper;
@@ -18,6 +21,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import org.java_avanzado.taller.controller.dto.response.ProductSummaryResponse;
 
 import java.util.List;
 
@@ -35,11 +40,16 @@ public class ProductController {
     /**
      * Returns all active products as summary data.
      *
+     * @param filter   filter criteria
+     * @param pageable pagination and sorting information
      * @return a list of active product summaries
      */
     @GetMapping
-    public ResponseEntity<List<ProductSummaryResponse>> getAllProducts() {
-        return ResponseEntity.ok(productMapper.fromProductListToSummaryList(productService.getAllActiveProducts()));
+    public ResponseEntity<PaginatedResponse<ProductSummaryResponse>> getAllProducts(
+            ProductFilterDto filter, Pageable pageable) {
+        Page<Product> products = productService.getProducts(filter, pageable);
+        Page<ProductSummaryResponse> responsePage = products.map(productMapper::fromProductToSummary);
+        return ResponseEntity.ok(PaginatedResponse.from(responsePage));
     }
 
     /**
