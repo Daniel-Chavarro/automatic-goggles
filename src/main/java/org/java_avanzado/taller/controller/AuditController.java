@@ -1,6 +1,14 @@
 package org.java_avanzado.taller.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.java_avanzado.taller.domain.model.EventLog;
 import org.java_avanzado.taller.persistence.entity.EventLogEntity;
 import org.java_avanzado.taller.service.EventLogService;
 import org.java_avanzado.taller.controller.dto.request.filter.AuditFilterDto;
@@ -14,9 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-/**
- * Exposes audit log retrieval endpoints.
- */
+@Tag(name = "Audit", description = "Audit log retrieval operations")
 @RestController
 @RequestMapping("/api/audit")
 @RequiredArgsConstructor
@@ -24,17 +30,17 @@ public class AuditController {
 
     private final EventLogService eventLogService;
 
-    /**
-     * Returns a paginated and filtered list of audit log entries.
-     *
-     * @param filter   the filter criteria
-     * @param pageable pagination and sorting information
-     * @return the stored audit events
-     */
+    @Operation(summary = "Get audit logs", description = "Returns a paginated list of audit log entries with optional filtering by event type, username, and date range.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Audit logs retrieved successfully"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
+            @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content)
+    })
     @GetMapping
-    public ResponseEntity<PaginatedResponse<EventLogEntity>> getAuditLogs(
-            AuditFilterDto filter, Pageable pageable) {
-        Page<EventLogEntity> logs = eventLogService.getLogs(filter, pageable);
+    public ResponseEntity<PaginatedResponse<EventLog>> getAuditLogs(
+            @Parameter(description = "Filter criteria for audit logs") AuditFilterDto filter,
+            @Parameter(description = "Pagination and sorting information") Pageable pageable) {
+        Page<EventLog> logs = eventLogService.getLogs(filter, pageable);
         return ResponseEntity.ok(PaginatedResponse.from(logs));
     }
 }

@@ -2,6 +2,8 @@ package org.java_avanzado.taller.persistence.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.java_avanzado.taller.domain.model.enums.EventType;
+
 import java.time.LocalDateTime;
 
 /**
@@ -27,10 +29,11 @@ public class EventLogEntity {
     private Long id;
 
     /**
-     * Type identifier for the event (e.g., "LOGIN_SUCCESS", "LOGIN_FAILED").
+     * Type identifier for the event.
      */
     @Column(nullable = false)
-    private String eventType;
+    @Enumerated(EnumType.STRING)
+    private EventType eventType;
 
     /**
      * Additional details or context about the event.
@@ -45,8 +48,8 @@ public class EventLogEntity {
     private LocalDateTime timestamp;
     
     /**
-     * Associated username, if applicable.
+     * Associated email, if applicable.
      */
     @Column
-    private String username;
+    private String email;
 }
