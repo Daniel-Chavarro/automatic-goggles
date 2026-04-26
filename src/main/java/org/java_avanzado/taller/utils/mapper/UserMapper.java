@@ -8,13 +8,13 @@ import org.java_avanzado.taller.controller.dto.response.UserSummaryResponse;
 import org.java_avanzado.taller.domain.model.User;
 import org.java_avanzado.taller.persistence.entity.UserEntity;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 
 import java.util.List;
 
-@Mapper(componentModel = MappingConstants.ComponentModel.SPRING, nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+@Mapper(componentModel = MappingConstants.ComponentModel.SPRING,
+        nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface UserMapper {
 
     // Entity <-> Domain
@@ -25,16 +25,8 @@ public interface UserMapper {
     User fromCreateUserRequestToDomain(CreateUserRequest request);
     User fromRegisterUserRequestToDomain(RegisterUserRequest request);
 
-    // Update Request -> Domain (merge with existing)
-    @Mapping(source = "existingUser.id", target = "id")
-    @Mapping(source = "existingUser.password", target = "password")
-    @Mapping(source = "existingUser.role", target = "role")
-    @Mapping(source = "existingUser.email", target = "email")
-    @Mapping(source = "existingUser.active", target = "active")
-    @Mapping(source = "request.firstName", target = "firstName")
-    @Mapping(source = "request.lastName", target = "lastName")
-    @Mapping(source = "request.phone", target = "phone")
-    User fromUpdateUserRequestToDomain(UpdateUserRequest request, User existingUser);
+    // Update Request -> Domain model
+    User fromUpdateUserRequestToDomain(UpdateUserRequest request);
 
     // Domain -> Response
     UserResponse fromUserToResponse(User user);

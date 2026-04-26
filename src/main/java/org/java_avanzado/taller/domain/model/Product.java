@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 
 import org.java_avanzado.taller.domain.exception.InsufficientStockException;
+
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
@@ -46,13 +47,21 @@ public class Product {
     /**
      * Indicates whether the product is active and available.
      */
-    private boolean active;
+    @Builder.Default
+    private boolean active = true;
 
     /**
      * Optimistic locking version.
      */
     private BigInteger version;
 
+    /**
+     * Deducts the specified amount from the product's stock quantity, ensuring that the resulting stock does not become negative.
+     * <p>
+     * Note: If the amount is negative, the result will be an increase in stock.
+     *
+     * @param amount The amount to deduct from the stock.
+     */
     public void deductStock(int amount) {
         if (this.quantity < amount) {
             throw new InsufficientStockException("Not enough stock for product: " + this.name);

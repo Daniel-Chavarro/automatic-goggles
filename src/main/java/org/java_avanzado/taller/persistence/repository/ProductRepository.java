@@ -16,7 +16,7 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Long> {
     /**
      * Finds all products matching the given name.
      */
-    List<ProductEntity> findAllByName(String name);
+    Optional<ProductEntity> findByName(String name);
 
     /**
      * Finds an active product by ID.

@@ -26,15 +26,8 @@ public interface ProductMapper {
     // Create Request -> Domain
     Product fromCreateProductRequestToDomain(CreateProductRequest request);
 
-    // Update Request -> Domain (merge with existing)
-    @Mapping(source = "existingProduct.id", target = "id")
-    @Mapping(source = "existingProduct.version", target = "version")
-    @Mapping(source = "existingProduct.active", target = "active")
-    @Mapping(source = "request.name", target = "name")
-    @Mapping(source = "request.description", target = "description")
-    @Mapping(source = "request.price", target = "price")
-    @Mapping(source = "request.quantity", target = "quantity")
-    Product fromUpdateProductRequestToDomain(UpdateProductRequest request, Product existingProduct);
+    // Update Request -> Domain 
+    Product fromUpdateProductRequestToDomain(UpdateProductRequest request);
 
     // Domain -> Response
     @Mapping(source = "quantity", target = "stock")

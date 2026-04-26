@@ -41,7 +41,7 @@ public class ProductEntity extends AuditableEntity {
     /**
      * Display name of the product.
      */
-    @Column(name = "name", nullable = false)
+    @Column(name = "name", nullable = false, unique = true)
     private String name;
 
     /**
@@ -53,25 +53,25 @@ public class ProductEntity extends AuditableEntity {
     /**
      * Current catalog price of the product.
      */
-    @Column(name = "price", precision = 10, scale = 2)
+    @Column(name = "price", precision = 10, scale = 2, nullable = false)
     private BigDecimal price;
 
     /**
      * Available stock for new orders.
      */
-    @Column(name = "stock_quantity")
+    @Column(name = "stock_quantity", nullable = false)
     private int stockQuantity;
 
     /**
      * Logical flag to enable or disable the product.
      */
-    @Column(name = "active")
+    @Column(name = "active", nullable = false)
     private boolean active;
 
     /**
      * Version used for optimistic concurrency control.
      */
     @Version
-    @Column(name = "version")
+    @Column(name = "version",  nullable = false)
     private Long version;
 }

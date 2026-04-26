@@ -45,10 +45,12 @@ public class User {
     /**
      * Authorization role assigned to the user.
      */
-    private UserRole role;
+    @Builder.Default
+    private UserRole role = UserRole.CLIENT;
 
     /**
      * Indicates whether the user is currently active.
      */
-    private boolean active;
+    @Builder.Default
+    private boolean active = true;
 }

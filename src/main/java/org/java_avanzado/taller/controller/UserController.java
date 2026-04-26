@@ -6,10 +6,18 @@ import org.java_avanzado.taller.controller.dto.request.create.CreateUserRequest;
 import org.java_avanzado.taller.controller.dto.request.update.UpdateUserRequest;
 import org.java_avanzado.taller.controller.dto.response.UserResponse;
 import org.java_avanzado.taller.controller.dto.response.UserSummaryResponse;
+import org.java_avanzado.taller.domain.model.User;
 import org.java_avanzado.taller.service.UserService;
 import org.java_avanzado.taller.utils.mapper.UserMapper;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.UUID;
@@ -54,19 +62,23 @@ public class UserController {
      */
     @PostMapping
     public ResponseEntity<UserResponse> createUser(@Valid @RequestBody CreateUserRequest request) {
-        return ResponseEntity.ok(userMapper.fromUserToResponse(userService.createUser(request)));
+        User user = userMapper.fromCreateUserRequestToDomain(request);
+        return ResponseEntity.ok(userMapper.fromUserToResponse(userService.createUser(user)));
     }
 
     /**
-     * Updates an existing user.
+     * Updates partially an existing user.
      *
-     * @param id user identifier
+     * @param id      user identifier
      * @param request validated update payload
      * @return the updated user
      */
-    @PutMapping("/{id}")
-    public ResponseEntity<UserResponse> updateUser(@PathVariable UUID id, @Valid @RequestBody UpdateUserRequest request) {
-        return ResponseEntity.ok(userMapper.fromUserToResponse(userService.updateUser(id, request)));
+    @PatchMapping("/{id}")
+    public ResponseEntity<UserResponse> updateUser(
+            @PathVariable UUID id,
+            @Valid @RequestBody UpdateUserRequest request) {
+        User user = userMapper.fromUpdateUserRequestToDomain(request);
+        return ResponseEntity.ok(userMapper.fromUserToResponse(userService.updateUser(id, user)));
     }
 
     /**

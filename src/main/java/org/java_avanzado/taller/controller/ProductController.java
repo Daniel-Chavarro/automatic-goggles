@@ -6,11 +6,18 @@ import org.java_avanzado.taller.controller.dto.request.create.CreateProductReque
 import org.java_avanzado.taller.controller.dto.request.update.UpdateProductRequest;
 import org.java_avanzado.taller.controller.dto.response.ProductResponse;
 import org.java_avanzado.taller.controller.dto.response.ProductSummaryResponse;
+import org.java_avanzado.taller.domain.model.Product;
 import org.java_avanzado.taller.service.ProductService;
 import org.java_avanzado.taller.utils.mapper.ProductMapper;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
@@ -53,22 +60,23 @@ public class ProductController {
      * @return the created product
      */
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ProductResponse> createProduct(@Valid @RequestBody CreateProductRequest request) {
-        return ResponseEntity.ok(productMapper.fromProductToResponse(productService.createProduct(request)));
+        Product product = productMapper.fromCreateProductRequestToDomain(request);
+        return ResponseEntity.ok(productMapper.fromProductToResponse(productService.createProduct(product)));
     }
 
     /**
      * Updates an existing product.
      *
-     * @param id product identifier
+     * @param id      product identifier
      * @param request validated update payload
      * @return the updated product
      */
-    @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ProductResponse> updateProduct(@PathVariable Long id, @Valid @RequestBody UpdateProductRequest request) {
-        return ResponseEntity.ok(productMapper.fromProductToResponse(productService.updateProduct(id, request)));
+    @PatchMapping("/{id}")
+    public ResponseEntity<ProductResponse> updateProduct(@PathVariable Long id,
+                                                         @Valid @RequestBody UpdateProductRequest request) {
+        Product product = productMapper.fromUpdateProductRequestToDomain(request);
+        return ResponseEntity.ok(productMapper.fromProductToResponse(productService.updateProduct(id, product)));
     }
 
     /**
@@ -78,7 +86,6 @@ public class ProductController {
      * @return an empty response with no content
      */
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
         productService.deleteProduct(id);
         return ResponseEntity.noContent().build();

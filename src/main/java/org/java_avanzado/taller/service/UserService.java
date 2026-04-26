@@ -1,8 +1,6 @@
 package org.java_avanzado.taller.service;
 
 import lombok.RequiredArgsConstructor;
-import org.java_avanzado.taller.controller.dto.request.create.CreateUserRequest;
-import org.java_avanzado.taller.controller.dto.request.update.UpdateUserRequest;
 import org.java_avanzado.taller.domain.exception.BadCredentialsException;
 import org.java_avanzado.taller.domain.exception.EmailAlreadyExistsException;
 import org.java_avanzado.taller.domain.exception.InactiveUserException;
@@ -19,6 +17,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
+import static org.java_avanzado.taller.utils.validators.AuxiliaryMethods.modify;
 
 /**
  * Service for user management operations.
@@ -39,9 +39,10 @@ public class UserService {
      *
      * @param user the user domain model containing registration data
      * @return a JWT token for the newly registered user
-     * @throws IllegalArgumentException if user, email, or password is missing
+     * @throws IllegalArgumentException    if user, email, or password is missing
      * @throws EmailAlreadyExistsException if the email is already registered
      */
+    @Deprecated(forRemoval = true)
     @Transactional
     public String registerUser(User user) {
         if (user == null) {
@@ -66,16 +67,17 @@ public class UserService {
         return jwtService.generateToken(entity.getEmail());
     }
 
-/**
+    /**
      * Authenticates a user with email and password.
      *
-     * @param email the user's email address
+     * @param email    the user's email address
      * @param password the user's plain-text password
      * @return a JWT token if authentication succeeds
      * @throws BadCredentialsException if email not found or password mismatch
-     * @throws InactiveUserException if the account is disabled
+     * @throws InactiveUserException   if the account is disabled
      */
     @Transactional(readOnly = true)
+    @Deprecated(forRemoval = true)
     public String authenticate(String email, String password) {
         UserEntity user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new BadCredentialsException("Invalid credentials"));
@@ -140,48 +142,75 @@ public class UserService {
         userRepository.save(entity);
     }
 
+    /**
+     * Creates a new user account with the provided data.
+     *
+     * @param user the user domain model
+     * @return the created user domain model
+     */
     @Transactional
-    public User createUser(CreateUserRequest request) {
-        if (request.getEmail() == null || request.getEmail().isBlank()) {
-            throw new IllegalArgumentException("Email is required");
-        }
-        if (request.getPassword() == null || request.getPassword().isBlank()) {
-            throw new IllegalArgumentException("Password is required");
-        }
-        if (userRepository.findByEmail(request.getEmail()).isPresent()) {
+    public User createUser(User user) {
+        validateUser(user);
+
+        if (userRepository.findByEmail(user.getEmail()).isPresent()) {
             throw new EmailAlreadyExistsException("Email already in use");
         }
-
-        User user = User.builder()
-                .firstName(request.getFirstName())
-                .lastName(request.getLastName())
-                .email(request.getEmail())
-                .phone(request.getPhone())
-                .password(request.getPassword())
-                .role(request.getRole() != null ? request.getRole() : UserRole.CLIENT)
-                .active(true)
-                .build();
 
         UserEntity entity = userMapper.fromUserToEntity(user);
         entity.setPassword(passwordEncoder.encode(user.getPassword()));
         return userMapper.fromUserEntityToDomain(userRepository.save(entity));
     }
 
+    /**
+     * Updates mutable fields of an existing user account.
+     *
+     * @param id   the user's UUID
+     * @param data the updated user data
+     * @return the updated user domain model
+     */
     @Transactional
-    public User updateUser(UUID id, UpdateUserRequest request) {
+    public User updateUser(UUID id, User data) {
         UserEntity entity = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
 
-        if (request.getFirstName() != null) {
-            entity.setFirstName(request.getFirstName());
-        }
-        if (request.getLastName() != null) {
-            entity.setLastName(request.getLastName());
-        }
-        if (request.getPhone() != null) {
-            entity.setPhone(request.getPhone());
+        modify(data.getFirstName(), entity::setFirstName);
+        modify(data.getLastName(), entity::setLastName);
+
+        if (userRepository.findByEmail(data.getEmail()).isPresent()) {
+            throw new EmailAlreadyExistsException("Email already in use");
         }
 
+        modify(data.getEmail(), entity::setEmail);
+
+        // Future: update password using Baeldung
+
         return userMapper.fromUserEntityToDomain(userRepository.save(entity));
+    }
+
+    /**
+     * Auxiliary method to validate user data before creation.
+     *
+     * @param user the user domain model to validate
+     * @throws IllegalArgumentException if any required field is missing or blank
+     */
+    private void validateUser(User user) {
+        if (user.getEmail() == null || user.getEmail().isBlank()) {
+            throw new IllegalArgumentException("Email is required");
+        }
+        if (user.getPassword() == null || user.getPassword().isBlank()) {
+            throw new IllegalArgumentException("Password is required");
+        }
+
+        if (user.getFirstName() == null || user.getFirstName().isBlank()) {
+            throw new IllegalArgumentException("First name is required");
+        }
+
+        if (user.getLastName() == null || user.getLastName().isBlank()) {
+            throw new IllegalArgumentException("Last name is required");
+        }
+
+        if (user.getPhone() == null || user.getPhone().isBlank()) {
+            throw new IllegalArgumentException("Phone number is required");
+        }
     }
 }

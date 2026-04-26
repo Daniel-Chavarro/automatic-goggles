@@ -10,6 +10,7 @@ import org.java_avanzado.taller.domain.model.enums.OrderStatus;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Entity that represents a purchase order.
@@ -46,6 +47,12 @@ public class OrderEntity extends AuditableEntity {
     private OrderStatus orderStatus;
 
     /**
+     * Flag indicating if the order is active or has been logically deleted.
+     */
+    @Column(name = "active", nullable = false)
+    private boolean active;
+
+    /**
      * Version value used for optimistic concurrency control.
      */
     @Version
@@ -56,7 +63,7 @@ public class OrderEntity extends AuditableEntity {
      * Order items with full cascade and orphan removal.
      */
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<OrderProductEntity> orderProducts;
+    private Set<OrderProductEntity> orderProducts;
 
     /**
      * Owner user of the order.
