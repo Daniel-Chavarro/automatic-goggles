@@ -6,6 +6,7 @@ import lombok.Data;
 import org.java_avanzado.taller.domain.model.enums.OrderStatus;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -21,5 +22,5 @@ public class OrderResponse {
     private OrderStatus status;
     private List<OrderItemResponse> items;
     private boolean active;
-    private LocalDateTime createdAt;
+    private Instant createdAt;
 }

@@ -9,6 +9,7 @@ import org.java_avanzado.taller.domain.exception.ProductNotFoundException;
 import org.java_avanzado.taller.domain.model.enums.OrderStatus;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -51,6 +52,16 @@ public class Order {
      * Indicates whether the order is active in the system.
      */
     private boolean active;
+
+    /**
+     * Timestamp when the order was created.
+     */
+    private Instant createdAt;
+
+    /**
+     * Timestamp of the last update to the order.
+     */
+    private Instant updatedAt;
 
     /**
      * Adds a product to the order with the specified quantity, ensuring that the product has sufficient stock.

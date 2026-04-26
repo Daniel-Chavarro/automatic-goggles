@@ -9,6 +9,7 @@ import org.java_avanzado.taller.domain.exception.InsufficientStockException;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.time.Instant;
 
 /**
  * Domain model representing a catalog product.
@@ -54,6 +55,16 @@ public class Product {
      * Optimistic locking version.
      */
     private BigInteger version;
+
+    /**
+     * Timestamp when the product was created.
+     */
+    private Instant createdAt;
+
+    /**
+     * Timestamp of the last update to the product.
+     */
+    private Instant updatedAt;
 
     /**
      * Deducts the specified amount from the product's stock quantity, ensuring that the resulting stock does not become negative.

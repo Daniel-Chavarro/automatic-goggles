@@ -15,6 +15,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.validation.BindException;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.slf4j.Logger;
@@ -99,6 +101,22 @@ public class GlobalExceptionHandler {
             .reduce((a, b) -> a + ", " + b)
             .orElse("Validation failed");
         return ResponseEntity.badRequest().body(Map.of("error", errors));
+    }
+
+    @ExceptionHandler(BindException.class)
+    public ResponseEntity<Map<String, String>> handleBindException(BindException ex) {
+        String errors = ex.getBindingResult().getFieldErrors().stream()
+            .map(e -> e.getField() + ": " + e.getDefaultMessage())
+            .reduce((a, b) -> a + ", " + b)
+            .orElse("Invalid filter parameters");
+        return ResponseEntity.badRequest().body(Map.of("error", errors));
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<Map<String, String>> handleTypeMismatch(MethodArgumentTypeMismatchException ex) {
+        String type = ex.getRequiredType() != null ? ex.getRequiredType().getSimpleName() : "Unknown";
+        String message = String.format("Parameter '%s' should be of type %s", ex.getName(), type);
+        return ResponseEntity.badRequest().body(Map.of("error", message));
     }
 
     @ExceptionHandler(RuntimeException.class)

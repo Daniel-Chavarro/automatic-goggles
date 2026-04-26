@@ -8,6 +8,7 @@ import org.java_avanzado.taller.controller.dto.response.UserSummaryResponse;
 import org.java_avanzado.taller.domain.model.User;
 import org.java_avanzado.taller.persistence.entity.UserEntity;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;

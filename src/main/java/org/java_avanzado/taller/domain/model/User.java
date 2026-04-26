@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Data;
 import org.java_avanzado.taller.domain.model.enums.UserRole;
 
+import java.time.Instant;
 import java.util.UUID;
 
 /**
@@ -53,4 +54,14 @@ public class User {
      */
     @Builder.Default
     private boolean active = true;
+
+    /**
+     * Timestamp when the user was created.
+     */
+    private Instant createdAt;
+
+    /**
+     * Timestamp of the last update to the user.
+     */
+    private Instant updatedAt;
 }

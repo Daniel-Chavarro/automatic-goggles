@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import org.java_avanzado.taller.domain.model.enums.UserRole;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -20,5 +21,5 @@ public class UserResponse {
     private String phone;
     private UserRole role;
     private boolean active;
-    private LocalDateTime createdAt;
+    private Instant createdAt;
 }
