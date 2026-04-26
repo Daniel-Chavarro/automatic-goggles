@@ -464,11 +464,12 @@ git commit -m "feat(security): Add Spring Security stateless configuration"
 - Create: `src/main/java/org/java_avanzado/taller/service/RefreshTokenService.java`
 
 - [ ] **Step 1: Create `RefreshTokenService`**
+
 ```java
 package org.java_avanzado.taller.service;
 
 import lombok.RequiredArgsConstructor;
-import org.java_avanzado.taller.domain.exception.UserNotFoundException;
+import org.java_avanzado.taller.exception.UserNotFoundException;
 import org.java_avanzado.taller.persistence.entity.RefreshTokenEntity;
 import org.java_avanzado.taller.persistence.repository.RefreshTokenRepository;
 import org.java_avanzado.taller.persistence.repository.UserRepository;

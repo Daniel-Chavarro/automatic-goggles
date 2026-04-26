@@ -2,15 +2,17 @@ package org.java_avanzado.taller.domain.model;
 
 import lombok.Builder;
 import lombok.Data;
-import org.java_avanzado.taller.domain.exception.InsufficientStockException;
-import org.java_avanzado.taller.domain.exception.OrderFinishedExeption;
-import org.java_avanzado.taller.domain.exception.ProductAlreadyInOrderException;
-import org.java_avanzado.taller.domain.exception.ProductNotFoundException;
+import org.java_avanzado.taller.exception.InsufficientStockException;
+import org.java_avanzado.taller.exception.OrderFinishedExeption;
+import org.java_avanzado.taller.exception.ProductAlreadyInOrderException;
+import org.java_avanzado.taller.exception.ProductNotFoundException;
 import org.java_avanzado.taller.domain.model.enums.OrderStatus;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -181,5 +183,20 @@ public class Order {
         existingOrderProduct.setQuantity(newQuantity);
         totalPrice = totalPrice.add(product.getPrice().multiply(BigDecimal.valueOf(quantityDifference)));
         product.deductStock(quantityDifference);
+    }
+
+    public List<OrderProduct> modifyOrderStatus(OrderStatus newStatus) {
+        if (!this.orderStatus.equals(OrderStatus.PENDING)) {
+            throw new OrderFinishedExeption("Cannot update order status, order status is " + this.orderStatus);
+        }
+
+        List<OrderProduct> productsToRestock = null;
+
+        if (newStatus == OrderStatus.REJECTED) {
+            productsToRestock = new ArrayList<>(orderProducts);
+        }
+
+        this.setOrderStatus(newStatus);
+        return productsToRestock;
     }
 }

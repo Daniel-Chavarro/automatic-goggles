@@ -1,8 +1,8 @@
 package org.java_avanzado.taller.service;
 
 import lombok.RequiredArgsConstructor;
-import org.java_avanzado.taller.domain.exception.TokenRefreshExpiredException;
-import org.java_avanzado.taller.domain.exception.UserNotFoundException;
+import org.java_avanzado.taller.exception.TokenRefreshExpiredException;
+import org.java_avanzado.taller.exception.UserNotFoundException;
 import org.java_avanzado.taller.persistence.entity.RefreshTokenEntity;
 import org.java_avanzado.taller.persistence.entity.UserEntity;
 import org.java_avanzado.taller.persistence.repository.RefreshTokenRepository;

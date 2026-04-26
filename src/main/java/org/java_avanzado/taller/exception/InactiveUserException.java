@@ -1,4 +1,4 @@
-package org.java_avanzado.taller.domain.exception;
+package org.java_avanzado.taller.exception;
 
 /**
  * Exception thrown when attempting to authenticate with a disabled account.

@@ -5,7 +5,7 @@ import jakarta.validation.constraints.Positive;
 import lombok.Builder;
 import lombok.Data;
 
-import org.java_avanzado.taller.domain.exception.InsufficientStockException;
+import org.java_avanzado.taller.exception.InsufficientStockException;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;

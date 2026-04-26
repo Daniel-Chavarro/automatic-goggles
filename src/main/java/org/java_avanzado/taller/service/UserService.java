@@ -2,8 +2,8 @@ package org.java_avanzado.taller.service;
 
 import lombok.RequiredArgsConstructor;
 import org.java_avanzado.taller.controller.dto.request.filter.UserFilterDto;
-import org.java_avanzado.taller.domain.exception.EmailAlreadyExistsException;
-import org.java_avanzado.taller.domain.exception.UserNotFoundException;
+import org.java_avanzado.taller.exception.EmailAlreadyExistsException;
+import org.java_avanzado.taller.exception.UserNotFoundException;
 import org.java_avanzado.taller.domain.model.User;
 import org.java_avanzado.taller.persistence.entity.UserEntity;
 import org.java_avanzado.taller.persistence.repository.UserRepository;

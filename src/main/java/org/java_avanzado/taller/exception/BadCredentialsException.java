@@ -1,4 +1,4 @@
-package org.java_avanzado.taller.domain.exception;
+package org.java_avanzado.taller.exception;
 
 /**
  * Exception thrown when authentication credentials are invalid.

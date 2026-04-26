@@ -1,4 +1,4 @@
-package org.java_avanzado.taller.domain.exception;
+package org.java_avanzado.taller.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;

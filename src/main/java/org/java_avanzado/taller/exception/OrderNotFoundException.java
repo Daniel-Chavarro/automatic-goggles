@@ -1,4 +1,4 @@
-package org.java_avanzado.taller.domain.exception;
+package org.java_avanzado.taller.exception;
 
 public class OrderNotFoundException extends RuntimeException {
     public OrderNotFoundException(String message) {

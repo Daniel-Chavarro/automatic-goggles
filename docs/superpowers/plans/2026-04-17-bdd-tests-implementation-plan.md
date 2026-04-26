@@ -371,9 +371,11 @@ package org.java_avanzado.taller.service;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
+
 import java.util.List;
 import java.util.Optional;
-import org.java_avanzado.taller.domain.exception.ProductNotFoundException;
+
+import org.java_avanzado.taller.exception.ProductNotFoundException;
 import org.java_avanzado.taller.persistence.repository.ProductRepository;
 import org.java_avanzado.taller.support.TestDataFactory;
 import org.java_avanzado.taller.utils.mapper.ProductMapper;
@@ -386,9 +388,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 class ProductServiceTest {
-    @Mock ProductRepository productRepository;
-    @Mock ProductMapper productMapper;
-    @InjectMocks ProductService productService;
+    @Mock
+    ProductRepository productRepository;
+    @Mock
+    ProductMapper productMapper;
+    @InjectMocks
+    ProductService productService;
 
     @Nested
     class given_existingActiveProduct {
@@ -439,8 +444,10 @@ package org.java_avanzado.taller.service;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
+
 import java.util.Optional;
-import org.java_avanzado.taller.domain.exception.EmailAlreadyExistsException;
+
+import org.java_avanzado.taller.exception.EmailAlreadyExistsException;
 import org.java_avanzado.taller.persistence.repository.UserRepository;
 import org.java_avanzado.taller.support.TestDataFactory;
 import org.java_avanzado.taller.utils.mapper.UserMapper;
@@ -454,11 +461,16 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
-    @Mock UserRepository userRepository;
-    @Mock UserMapper userMapper;
-    @Mock PasswordEncoder passwordEncoder;
-    @Mock JwtService jwtService;
-    @InjectMocks UserService userService;
+    @Mock
+    UserRepository userRepository;
+    @Mock
+    UserMapper userMapper;
+    @Mock
+    PasswordEncoder passwordEncoder;
+    @Mock
+    JwtService jwtService;
+    @InjectMocks
+    UserService userService;
 
     @Nested
     class given_newUserEmail {

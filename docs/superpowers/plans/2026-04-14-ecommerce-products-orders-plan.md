@@ -82,40 +82,42 @@ git commit -m "fix(domain): add explicit constructors to enums to fix compiler e
 ```java
 // In src/main/java/org/java_avanzado/taller/service/ProductService.java
 // Add these methods inside the class
-    
-    @Transactional
-    public Product createProduct(Product product) {
-        ProductEntity entity = productMapper.toEntity(product);
-        entity.setActive(true);
-        return productMapper.toDomain(productRepository.save(entity));
-    }
 
-    @Transactional
-    public Product updateProduct(Long id, Product product) {
-        ProductEntity entity = productRepository.findById(id)
-                .orElseThrow(() -> new org.java_avanzado.taller.domain.exception.ProductNotFoundException("Product not found"));
-        entity.setName(product.getName());
-        entity.setDescription(product.getDescription());
-        entity.setPrice(product.getPrice());
-        entity.setStockQuantity(product.getQuantity());
-        return productMapper.toDomain(productRepository.save(entity));
-    }
+import org.java_avanzado.taller.exception.ProductNotFoundException;
 
-    @Transactional
-    public void deleteProduct(Long id) {
-        ProductEntity entity = productRepository.findById(id)
-                .orElseThrow(() -> new org.java_avanzado.taller.domain.exception.ProductNotFoundException("Product not found"));
-        entity.setActive(false);
-        productRepository.save(entity);
-    }
+@Transactional
+public Product createProduct(Product product) {
+    ProductEntity entity = productMapper.toEntity(product);
+    entity.setActive(true);
+    return productMapper.toDomain(productRepository.save(entity));
+}
 
-    @Transactional(readOnly = true)
-    public java.util.List<Product> getAllActiveProducts() {
-        return productRepository.findAll().stream()
-                .filter(ProductEntity::isActive)
-                .map(productMapper::toDomain)
-                .collect(java.util.stream.Collectors.toList());
-    }
+@Transactional
+public Product updateProduct(Long id, Product product) {
+    ProductEntity entity = productRepository.findById(id)
+            .orElseThrow(() -> new ProductNotFoundException("Product not found"));
+    entity.setName(product.getName());
+    entity.setDescription(product.getDescription());
+    entity.setPrice(product.getPrice());
+    entity.setStockQuantity(product.getQuantity());
+    return productMapper.toDomain(productRepository.save(entity));
+}
+
+@Transactional
+public void deleteProduct(Long id) {
+    ProductEntity entity = productRepository.findById(id)
+            .orElseThrow(() -> new ProductNotFoundException("Product not found"));
+    entity.setActive(false);
+    productRepository.save(entity);
+}
+
+@Transactional(readOnly = true)
+public java.util.List<Product> getAllActiveProducts() {
+    return productRepository.findAll().stream()
+            .filter(ProductEntity::isActive)
+            .map(productMapper::toDomain)
+            .collect(java.util.stream.Collectors.toList());
+}
 ```
 
 - [ ] **Step 2: Create ProductController**

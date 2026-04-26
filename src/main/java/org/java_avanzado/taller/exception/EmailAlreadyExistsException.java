@@ -1,4 +1,4 @@
-package org.java_avanzado.taller.domain.exception;
+package org.java_avanzado.taller.exception;
 
 /**
  * Exception thrown when attempting to create a user with an email that already exists.

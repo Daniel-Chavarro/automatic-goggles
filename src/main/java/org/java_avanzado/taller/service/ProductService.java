@@ -4,7 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.java_avanzado.taller.controller.dto.request.create.CreateProductRequest;
 import org.java_avanzado.taller.controller.dto.request.filter.ProductFilterDto;
 import org.java_avanzado.taller.controller.dto.request.update.UpdateProductRequest;
-import org.java_avanzado.taller.domain.exception.ProductNotFoundException;
+import org.java_avanzado.taller.exception.ProductNotFoundException;
+import org.java_avanzado.taller.domain.model.OrderProduct;
 import org.java_avanzado.taller.domain.model.Product;
 import org.java_avanzado.taller.persistence.entity.ProductEntity;
 import org.java_avanzado.taller.persistence.repository.ProductRepository;
@@ -17,7 +18,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static org.java_avanzado.taller.utils.validators.AuxiliaryMethods.modify;
@@ -139,6 +142,32 @@ public class ProductService {
                 .filter(ProductEntity::isActive)
                 .map(productMapper::fromProductEntityToDomain)
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * Restocks products based on the provided order products list.
+     * For each order product, increases the product stock by the quantity specified.
+     *
+     * @param orderProducts list of order products containing productId and quantity to restore
+     */
+    @Transactional
+    public void restockProducts(List<OrderProduct> orderProducts) {
+        Map<Long, Integer> restockQuantities = new HashMap<>();
+        
+        for (OrderProduct orderProduct : orderProducts) {
+            restockQuantities.merge(orderProduct.getProductId(), orderProduct.getQuantity(), Integer::sum);
+        }
+
+        for (Map.Entry<Long, Integer> entry : restockQuantities.entrySet()) {
+            Long productId = entry.getKey();
+            int quantityToRestock = entry.getValue();
+
+            ProductEntity entity = productRepository.findById(productId)
+                    .orElseThrow(() -> new ProductNotFoundException("Product not found with id: " + productId));
+
+            entity.setStockQuantity(entity.getStockQuantity() + quantityToRestock);
+            productRepository.save(entity);
+        }
     }
 
     /**

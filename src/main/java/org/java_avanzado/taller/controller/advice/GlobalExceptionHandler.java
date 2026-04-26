@@ -1,16 +1,16 @@
 package org.java_avanzado.taller.controller.advice;
 
-import org.java_avanzado.taller.domain.exception.BadCredentialsException;
-import org.java_avanzado.taller.domain.exception.EmailAlreadyExistsException;
-import org.java_avanzado.taller.domain.exception.InactiveUserException;
-import org.java_avanzado.taller.domain.exception.InsufficientStockException;
-import org.java_avanzado.taller.domain.exception.OrderFinishedExeption;
-import org.java_avanzado.taller.domain.exception.OrderNotFoundException;
-import org.java_avanzado.taller.domain.exception.ProductAlreadyInOrderException;
-import org.java_avanzado.taller.domain.exception.ProductDisabledError;
-import org.java_avanzado.taller.domain.exception.ProductNotFoundException;
-import org.java_avanzado.taller.domain.exception.TokenRefreshExpiredException;
-import org.java_avanzado.taller.domain.exception.UserNotFoundException;
+import org.java_avanzado.taller.exception.BadCredentialsException;
+import org.java_avanzado.taller.exception.EmailAlreadyExistsException;
+import org.java_avanzado.taller.exception.InactiveUserException;
+import org.java_avanzado.taller.exception.InsufficientStockException;
+import org.java_avanzado.taller.exception.OrderFinishedExeption;
+import org.java_avanzado.taller.exception.OrderNotFoundException;
+import org.java_avanzado.taller.exception.ProductAlreadyInOrderException;
+import org.java_avanzado.taller.exception.ProductDisabledError;
+import org.java_avanzado.taller.exception.ProductNotFoundException;
+import org.java_avanzado.taller.exception.TokenRefreshExpiredException;
+import org.java_avanzado.taller.exception.UserNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;

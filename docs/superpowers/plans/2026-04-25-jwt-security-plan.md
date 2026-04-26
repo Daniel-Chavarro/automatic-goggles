@@ -116,7 +116,6 @@ git commit -m "feat: add CustomUserDetails implementing UserDetails"
 package org.java_avanzado.taller.security;
 
 import lombok.RequiredArgsConstructor;
-import org.java_avanzado.taller.domain.exception.UserNotFoundException;
 import org.java_avanzado.taller.persistence.repository.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -198,7 +197,7 @@ import lombok.RequiredArgsConstructor;
 import org.java_avanzado.taller.controller.dto.request.auth.LoginUserRequest;
 import org.java_avanzado.taller.controller.dto.request.auth.RegisterUserRequest;
 import org.java_avanzado.taller.controller.dto.response.JwtAuthResponse;
-import org.java_avanzado.taller.domain.exception.UserNotFoundException;
+import org.java_avanzado.taller.exception.UserNotFoundException;
 import org.java_avanzado.taller.persistence.entity.UserEntity;
 import org.java_avanzado.taller.persistence.repository.UserRepository;
 import org.java_avanzado.taller.security.CustomUserDetails;
@@ -269,7 +268,7 @@ public class AuthService {
 
     public JwtAuthResponse refresh(String refreshToken) {
         refreshTokenService.validateRefreshToken(refreshToken);
-        
+
         String email = refreshTokenService.getUserEmailFromRefreshToken(refreshToken);
         UserEntity user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException(email));

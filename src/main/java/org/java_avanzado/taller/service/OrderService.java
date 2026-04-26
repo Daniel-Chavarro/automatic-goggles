@@ -2,10 +2,11 @@ package org.java_avanzado.taller.service;
 
 import lombok.RequiredArgsConstructor;
 import org.java_avanzado.taller.controller.dto.request.filter.OrderFilterDto;
-import org.java_avanzado.taller.domain.exception.OrderNotFoundException;
-import org.java_avanzado.taller.domain.exception.ProductDisabledError;
-import org.java_avanzado.taller.domain.exception.ProductNotFoundException;
+import org.java_avanzado.taller.exception.OrderNotFoundException;
+import org.java_avanzado.taller.exception.ProductDisabledError;
+import org.java_avanzado.taller.exception.ProductNotFoundException;
 import org.java_avanzado.taller.domain.model.Order;
+import org.java_avanzado.taller.domain.model.OrderProduct;
 import org.java_avanzado.taller.domain.model.Product;
 import org.java_avanzado.taller.domain.model.enums.OrderStatus;
 import org.java_avanzado.taller.persistence.entity.OrderEntity;
@@ -197,7 +198,12 @@ public class OrderService {
     @Transactional
     public Order modifyOrderStatus(Long orderId, OrderStatus orderStatus) {
         Order order = getOrderById(orderId);
-        order.setOrderStatus(orderStatus);
+        List<OrderProduct> productsToRestock = order.modifyOrderStatus(orderStatus);
+        
+        if (productsToRestock != null && !productsToRestock.isEmpty()) {
+            productService.restockProducts(productsToRestock);
+        }
+        
         OrderEntity entity = orderRepository.findById(orderId)
                 .orElseThrow(() -> new OrderNotFoundException("Order not found with id: " + orderId));
         orderMapper.updateEntityFromDomain(order, entity);

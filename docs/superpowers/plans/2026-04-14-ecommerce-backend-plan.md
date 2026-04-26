@@ -98,18 +98,21 @@ public class InsufficientStockException extends RuntimeException {
 ```java
 // In src/main/java/org/java_avanzado/taller/domain/model/Product.java
 // Add missing BigInteger import
+
+import org.java_avanzado.taller.exception.InsufficientStockException;
+
 import java.math.BigInteger;
 
 // Add version field
-    private BigInteger version;
+private BigInteger version;
 
-// Add deductStock method
-    public void deductStock(int amount) {
-        if (this.quantity < amount) {
-            throw new org.java_avanzado.taller.domain.exception.InsufficientStockException("Not enough stock for product: " + this.name);
+        // Add deductStock method
+        public void deductStock(int amount) {
+            if (this.quantity < amount) {
+                throw new InsufficientStockException("Not enough stock for product: " + this.name);
+            }
+            this.quantity -= amount;
         }
-        this.quantity -= amount;
-    }
 ```
 
 - [ ] **Step 3: Compile to ensure no errors**
@@ -285,7 +288,7 @@ git commit -m "feat(service): implement ProductService retrieval logic"
 ```java
 package org.java_avanzado.taller.controller.advice;
 
-import org.java_avanzado.taller.domain.exception.InsufficientStockException;
+import org.java_avanzado.taller.exception.InsufficientStockException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
