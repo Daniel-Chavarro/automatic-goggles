@@ -1,7 +1,6 @@
 package org.java_avanzado.taller.utils.mapper;
 
 import org.java_avanzado.taller.controller.dto.request.create.AddOrderItemRequest;
-import org.java_avanzado.taller.controller.dto.request.create.CreateOrderRequest;
 import org.java_avanzado.taller.controller.dto.request.update.UpdateOrderRequest;
 import org.java_avanzado.taller.controller.dto.response.OrderItemResponse;
 import org.java_avanzado.taller.controller.dto.response.OrderResponse;
@@ -12,10 +11,12 @@ import org.java_avanzado.taller.persistence.entity.OrderEntity;
 import org.java_avanzado.taller.persistence.entity.OrderProductEntity;
 import org.java_avanzado.taller.persistence.entity.ProductEntity;
 import org.java_avanzado.taller.persistence.entity.UserEntity;
+import org.mapstruct.AfterMapping;
 import org.mapstruct.Context;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
+import org.mapstruct.MappingTarget;
 import org.mapstruct.Named;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 
@@ -23,51 +24,45 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-@Mapper(componentModel = MappingConstants.ComponentModel.SPRING, nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+@Mapper(componentModel = MappingConstants.ComponentModel.SPRING,
+        uses = {ReferenceMapper.class},
+        nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface OrderMapper {
 
     // Entity <-> Domain
+    @Mapping(source = "user.id", target = "userId")
     @Mapping(source = "orderProducts", target = "orderProducts")
     Order fromOrderEntityToDomain(OrderEntity entity);
 
     default OrderEntity fromOrderToEntity(Order domain) {
-        OrderEntity orderEntity = fromOrderToEntityInternal(domain);
-        if (orderEntity == null || orderEntity.getOrderProducts() == null) {
-            return orderEntity;
-        }
-        for (OrderProductEntity item : orderEntity.getOrderProducts()) {
-            item.setOrder(orderEntity);
-        }
-        return orderEntity;
+        return fromOrderToEntityInternal(domain);
     }
 
-    @Mapping(source = "userId", target = "user", qualifiedByName = "uuidToUserEntity")
+    @Mapping(source = "userId", target = "user")
     OrderEntity fromOrderToEntityInternal(Order domain);
+
+    @AfterMapping
+    default void linkOrderProducts(@MappingTarget OrderEntity orderEntity) {
+        if (orderEntity != null && orderEntity.getOrderProducts() != null) {
+            for (OrderProductEntity item : orderEntity.getOrderProducts()) {
+                item.setOrder(orderEntity);
+            }
+        }
+    }
+
+    @Mapping(source = "userId", target = "user")
+    void updateEntityFromDomain(Order domain, @MappingTarget OrderEntity entity);
 
     @Mapping(source = "product.id", target = "productId", qualifiedByName = "longToString")
     OrderProduct fromOrderProductEntityToDomain(OrderProductEntity entity);
 
-    @Mapping(source = "productId", target = "product", qualifiedByName = "stringToProductEntity")
     @Mapping(target = "order", ignore = true)
     OrderProductEntity fromOrderProductToEntity(OrderProduct domain);
 
-    // Create Request -> Domain
-    Order fromCreateOrderRequestToDomain(CreateOrderRequest request);
-    OrderProduct fromAddOrderItemRequestToDomain(AddOrderItemRequest request);
 
-    // Update Request -> Domain
-    @Mapping(source = "existingOrder.id", target = "id")
-    @Mapping(source = "existingOrder.userId", target = "userId")
-    @Mapping(source = "existingOrder.totalPrice", target = "totalPrice")
-    @Mapping(source = "request.status", target = "orderStatus")
-    @Mapping(source = "existingOrder.orderProducts", target = "orderProducts")
-    @Mapping(source = "existingOrder.active", target = "active")
-    Order fromUpdateOrderRequestToDomain(UpdateOrderRequest request, Order existingOrder);
 
-    // Domain -> Response (with additional parameter for product name)
-    @Mapping(source = "orderStatus", target = "status")
-    @Mapping(source = "orderProducts", target = "items")
-    OrderResponse fromOrderToResponse(Order order, @Context Map<String, String> productNameContext);
+    // Domain -> Response 
+    OrderResponse fromOrderToResponse(Order order);
 
     @Mapping(source = "orderStatus", target = "status")
     OrderSummaryResponse fromOrderToSummary(Order order);
@@ -91,24 +86,4 @@ public interface OrderMapper {
         return value == null ? null : Long.valueOf(value);
     }
 
-    @Named("uuidToUserEntity")
-    default UserEntity uuidToUserEntity(UUID userId) {
-        if (userId == null) {
-            return null;
-        }
-        UserEntity user = new UserEntity();
-        user.setId(userId);
-        return user;
     }
-
-    @Named("stringToProductEntity")
-    default ProductEntity stringToProductEntity(String productId) {
-        if (productId == null) {
-            return null;
-        }
-        ProductEntity product = new ProductEntity();
-        product.setId(Long.valueOf(productId));
-        return product;
-    }
-
-}
