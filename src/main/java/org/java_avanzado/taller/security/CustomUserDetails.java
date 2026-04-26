@@ -7,6 +7,7 @@ import org.java_avanzado.taller.domain.model.enums.UserRole;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.util.Assert;
 
 import java.util.Collection;
 import java.util.List;
@@ -17,6 +18,11 @@ import java.util.UUID;
 public class CustomUserDetails implements UserDetails {
 
     private User user;
+
+    public CustomUserDetails(User user) {
+        Assert.notNull(user, "User must not be null");
+        this.user = user;
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
