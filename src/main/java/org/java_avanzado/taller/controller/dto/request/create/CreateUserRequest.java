@@ -11,7 +11,7 @@ import org.java_avanzado.taller.domain.model.enums.UserRole;
 @Data
 @Schema(description = "Payload for creating a new user")
 public class CreateUserRequest extends RegisterUserRequest {
-    
+
     @Schema(description = "User's role in the system", requiredMode = Schema.RequiredMode.REQUIRED, example = "CLIENT")
     @NotNull
     private UserRole role;

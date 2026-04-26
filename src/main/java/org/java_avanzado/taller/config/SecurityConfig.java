@@ -1,15 +1,12 @@
 package org.java_avanzado.taller.config;
 
-import io.swagger.v3.oas.models.Components;
-import io.swagger.v3.oas.models.OpenAPI;
-import io.swagger.v3.oas.models.security.SecurityRequirement;
-import io.swagger.v3.oas.models.security.SecurityScheme;
 import lombok.RequiredArgsConstructor;
 import org.java_avanzado.taller.security.CustomAccessDeniedHandler;
 import org.java_avanzado.taller.security.CustomUserDetailsService;
 import org.java_avanzado.taller.security.jwt.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -60,7 +57,30 @@ public class SecurityConfig {
                                 "/swagger-ui/**",
                                 "/swagger-ui.html"
                         ).permitAll()
+
+                        // PRODUCTS
+                        .requestMatchers(HttpMethod.GET, "/api/products/**").hasAnyRole("ADMIN", "CLIENT")
+                        .requestMatchers(HttpMethod.POST, "/api/products/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PATCH, "/api/products/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/products/**").hasRole("ADMIN")
+
+                        // USERS
+                        .requestMatchers("/api/users/**").hasRole("ADMIN")
+
+                        // AUDIT
+                        .requestMatchers("/api/audit/**").hasRole("ADMIN")
+
+                        // ORDERS
+                        .requestMatchers(HttpMethod.PATCH, "/api/orders/**").hasAnyRole("ADMIN", "CLIENT")
+                        .requestMatchers(HttpMethod.GET, "/api/orders").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/orders/user/").hasAnyRole("ADMIN", "CLIENT")
+                        .requestMatchers(HttpMethod.POST, "/api/orders/user/").hasAnyRole("ADMIN", "CLIENT")
+                        .requestMatchers("/api/orders/*/items/**").hasAnyRole("ADMIN", "CLIENT")
+
+
                         .anyRequest().authenticated()
+
+
                 )
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -68,7 +88,7 @@ public class SecurityConfig {
                 .exceptionHandling(ex ->
                         ex.accessDeniedHandler(accessDeniedHandler))
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
-        
+
         return http.build();
     }
 }

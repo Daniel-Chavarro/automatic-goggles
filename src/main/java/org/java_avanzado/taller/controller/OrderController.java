@@ -10,16 +10,16 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.java_avanzado.taller.controller.dto.request.create.AddOrderItemRequest;
+import org.java_avanzado.taller.controller.dto.request.filter.OrderFilterDto;
 import org.java_avanzado.taller.controller.dto.request.update.UpdateOrderItemRequest;
 import org.java_avanzado.taller.controller.dto.request.update.UpdateOrderRequest;
 import org.java_avanzado.taller.controller.dto.response.OrderResponse;
 import org.java_avanzado.taller.controller.dto.response.OrderSummaryResponse;
+import org.java_avanzado.taller.controller.dto.response.PaginatedResponse;
 import org.java_avanzado.taller.domain.model.Order;
 import org.java_avanzado.taller.service.OrderService;
 import org.java_avanzado.taller.service.ProductService;
 import org.java_avanzado.taller.utils.mapper.OrderMapper;
-import org.java_avanzado.taller.controller.dto.request.filter.OrderFilterDto;
-import org.java_avanzado.taller.controller.dto.response.PaginatedResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -35,7 +35,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
 import java.util.UUID;
 
 @Tag(name = "Orders", description = "Order management operations")
@@ -48,7 +47,9 @@ public class OrderController {
     private final ProductService productService;
     private final OrderMapper orderMapper;
 
-    @Operation(summary = "Create a new order", description = "Creates a new order for the specified user. Initially empty, items must be added separately.")
+    @Operation(summary = "Create a new order", description = "Creates a new order for the specified user. " +
+            "Initially empty, items must be added separately." +
+            "\nRequires ADMIN OR CLIENT role")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "Order created successfully"),
             @ApiResponse(responseCode = "400", description = "Invalid request data", content = @Content),
@@ -63,7 +64,9 @@ public class OrderController {
         return ResponseEntity.status(HttpStatus.CREATED).body(orderMapper.fromOrderToResponse(order));
     }
 
-    @Operation(summary = "Get user orders", description = "Returns a paginated list of orders for a specific user with optional filtering.")
+    @Operation(summary = "Get user orders",
+            description = "Returns a paginated list of orders for a specific user with optional filtering." +
+                    "\nRequires ADMIN OR CLIENT role")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Orders retrieved successfully"),
             @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
@@ -81,7 +84,9 @@ public class OrderController {
         return ResponseEntity.ok(PaginatedResponse.from(responsePage));
     }
 
-    @Operation(summary = "Get all orders", description = "Returns a paginated list of all orders in the system with optional filtering.")
+    @Operation(summary = "Get all orders",
+            description = "Returns a paginated list of all orders in the system with optional filtering." +
+                    "\nRequires ADMIN role")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Orders retrieved successfully"),
             @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
@@ -111,7 +116,10 @@ public class OrderController {
         return ResponseEntity.noContent().build();
     }
 
-    @Operation(summary = "Add product to order", description = "Adds a product to an existing order with the specified quantity. Updates order total and product stock.")
+    @Operation(summary = "Add product to order",
+            description = "Adds a product to an existing order with the specified quantity. " +
+                    "Updates order total and product stock." +
+                    "\nRequires ADMIN OR CLIENT role")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Product added to order successfully"),
             @ApiResponse(responseCode = "400", description = "Invalid request data", content = @Content),
@@ -133,7 +141,10 @@ public class OrderController {
         return ResponseEntity.ok(orderMapper.fromOrderToResponse(updatedOrder));
     }
 
-    @Operation(summary = "Update product quantity in order", description = "Modifies the quantity of a specific product in an existing order. Updates order total and product stock accordingly.")
+    @Operation(summary = "Update product quantity in order",
+            description = "Modifies the quantity of a specific product in an existing order. " +
+                    "Updates order total and product stock accordingly." +
+                    "\nRequires ADMIN OR CLIENT role")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Product quantity updated successfully"),
             @ApiResponse(responseCode = "400", description = "Invalid request data", content = @Content),
@@ -156,7 +167,10 @@ public class OrderController {
         return ResponseEntity.ok(orderMapper.fromOrderToResponse(updatedOrder));
     }
 
-    @Operation(summary = "Update order status", description = "Updates the status of an existing order (e.g., from PENDING to APPROVED or REJECTED).")
+    @Operation(summary = "Update order status",
+            description = "Updates the status of an existing order " +
+                    "(e.g., from PENDING to APPROVED or REJECTED)." +
+                    "\nRequires ADMIN OR CLIENT role")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Order status updated successfully"),
             @ApiResponse(responseCode = "400", description = "Invalid request data", content = @Content),
@@ -172,13 +186,14 @@ public class OrderController {
                     required = true,
                     content = @Content(schema = @Schema(implementation = UpdateOrderRequest.class)))
             @Valid @RequestBody UpdateOrderRequest request) {
-        // This would call the service method - but it doesn't exist yet
-        // For now returning the existing order without modification to avoid breaking changes
-        Order order = orderService.getOrderById(id);
+        Order order = orderService.modifyOrderStatus(id, request.getStatus());
         return ResponseEntity.ok(orderMapper.fromOrderToResponse(order));
     }
 
-    @Operation(summary = "Remove product from order", description = "Removes a specific product from an existing order. Updates order total and restores product stock.")
+    @Operation(summary = "Remove product from order",
+            description = "Removes a specific product from an existing order. " +
+                    "Updates order total and restores product stock." +
+                    "\nRequires ADMIN OR CLIENT role")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Product removed from order successfully"),
             @ApiResponse(responseCode = "400", description = "Invalid request data", content = @Content),

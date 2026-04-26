@@ -7,10 +7,10 @@ import lombok.Getter;
  * Defines the lifecycle states available for an order.
  */
 @Getter
-@Schema(description = "Order lifecycle states", 
+@Schema(description = "Order lifecycle states",
         allowableValues = {"PENDING", "APPROVED", "REJECTED"})
 public enum OrderStatus {
-    
+
     /**
      * Order was created and is waiting for review.
      */

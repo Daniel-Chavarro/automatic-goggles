@@ -1,7 +1,5 @@
 package org.java_avanzado.taller.utils.mapper;
 
-import org.java_avanzado.taller.controller.dto.request.create.AddOrderItemRequest;
-import org.java_avanzado.taller.controller.dto.request.update.UpdateOrderRequest;
 import org.java_avanzado.taller.controller.dto.response.OrderItemResponse;
 import org.java_avanzado.taller.controller.dto.response.OrderResponse;
 import org.java_avanzado.taller.controller.dto.response.OrderSummaryResponse;
@@ -9,8 +7,6 @@ import org.java_avanzado.taller.domain.model.Order;
 import org.java_avanzado.taller.domain.model.OrderProduct;
 import org.java_avanzado.taller.persistence.entity.OrderEntity;
 import org.java_avanzado.taller.persistence.entity.OrderProductEntity;
-import org.java_avanzado.taller.persistence.entity.ProductEntity;
-import org.java_avanzado.taller.persistence.entity.UserEntity;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Context;
 import org.mapstruct.Mapper;
@@ -22,7 +18,6 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING,
         uses = {ReferenceMapper.class},
@@ -60,8 +55,7 @@ public interface OrderMapper {
     OrderProductEntity fromOrderProductToEntity(OrderProduct domain);
 
 
-
-    // Domain -> Response 
+    // Domain -> Response
     OrderResponse fromOrderToResponse(Order order);
 
     @Mapping(source = "orderStatus", target = "status")
@@ -74,6 +68,7 @@ public interface OrderMapper {
 
     // List variants
     List<OrderResponse> fromOrderListToResponseList(List<Order> orders, @Context Map<String, String> productNameContext);
+
     List<OrderSummaryResponse> fromOrderListToSummaryList(List<Order> orders);
 
     @Named("longToString")
@@ -86,4 +81,4 @@ public interface OrderMapper {
         return value == null ? null : Long.valueOf(value);
     }
 
-    }
+}

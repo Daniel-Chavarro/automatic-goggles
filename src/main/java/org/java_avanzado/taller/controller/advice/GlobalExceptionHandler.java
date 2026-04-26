@@ -1,26 +1,26 @@
 package org.java_avanzado.taller.controller.advice;
 
-import org.java_avanzado.taller.domain.exception.InsufficientStockException;
 import org.java_avanzado.taller.domain.exception.BadCredentialsException;
-import org.java_avanzado.taller.domain.exception.InactiveUserException;
-import org.java_avanzado.taller.domain.exception.ProductNotFoundException;
-import org.java_avanzado.taller.domain.exception.UserNotFoundException;
 import org.java_avanzado.taller.domain.exception.EmailAlreadyExistsException;
+import org.java_avanzado.taller.domain.exception.InactiveUserException;
+import org.java_avanzado.taller.domain.exception.InsufficientStockException;
 import org.java_avanzado.taller.domain.exception.OrderFinishedExeption;
 import org.java_avanzado.taller.domain.exception.OrderNotFoundException;
 import org.java_avanzado.taller.domain.exception.ProductAlreadyInOrderException;
 import org.java_avanzado.taller.domain.exception.ProductDisabledError;
+import org.java_avanzado.taller.domain.exception.ProductNotFoundException;
 import org.java_avanzado.taller.domain.exception.TokenRefreshExpiredException;
+import org.java_avanzado.taller.domain.exception.UserNotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.validation.BindException;
-import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.util.Map;
 
@@ -49,8 +49,11 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", ex.getMessage()));
     }
 
-    @ExceptionHandler(BadCredentialsException.class)
-    public ResponseEntity<Map<String, String>> handleBadCredentials(BadCredentialsException ex) {
+    @ExceptionHandler({
+            BadCredentialsException.class,
+            org.springframework.security.authentication.BadCredentialsException.class,
+    })
+    public ResponseEntity<Map<String, String>> handleBadCredentials(Exception ex) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", ex.getMessage()));
     }
 
@@ -97,18 +100,18 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, String>> handleValidationException(MethodArgumentNotValidException ex) {
         String errors = ex.getBindingResult().getFieldErrors().stream()
-            .map(e -> e.getField() + ": " + e.getDefaultMessage())
-            .reduce((a, b) -> a + ", " + b)
-            .orElse("Validation failed");
+                .map(e -> e.getField() + ": " + e.getDefaultMessage())
+                .reduce((a, b) -> a + ", " + b)
+                .orElse("Validation failed");
         return ResponseEntity.badRequest().body(Map.of("error", errors));
     }
 
     @ExceptionHandler(BindException.class)
     public ResponseEntity<Map<String, String>> handleBindException(BindException ex) {
         String errors = ex.getBindingResult().getFieldErrors().stream()
-            .map(e -> e.getField() + ": " + e.getDefaultMessage())
-            .reduce((a, b) -> a + ", " + b)
-            .orElse("Invalid filter parameters");
+                .map(e -> e.getField() + ": " + e.getDefaultMessage())
+                .reduce((a, b) -> a + ", " + b)
+                .orElse("Invalid filter parameters");
         return ResponseEntity.badRequest().body(Map.of("error", errors));
     }
 

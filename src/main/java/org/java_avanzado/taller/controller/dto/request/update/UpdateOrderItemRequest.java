@@ -11,11 +11,11 @@ import lombok.Data;
 @Data
 @Schema(description = "Payload for updating the quantity of a product in an order")
 public class UpdateOrderItemRequest {
-    
+
     @Schema(description = "Unique identifier of the product to update", example = "1", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotNull
     private Long productId;
-    
+
     @Schema(description = "New quantity for the product", example = "3", requiredMode = Schema.RequiredMode.REQUIRED, minimum = "1")
     @NotNull
     @Min(1)

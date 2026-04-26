@@ -14,7 +14,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
-import java.math.BigInteger;
 
 /**
  * Entity that represents a product in the catalog.
@@ -72,6 +71,6 @@ public class ProductEntity extends AuditableEntity {
      * Version used for optimistic concurrency control.
      */
     @Version
-    @Column(name = "version",  nullable = false)
+    @Column(name = "version", nullable = false)
     private Long version;
 }

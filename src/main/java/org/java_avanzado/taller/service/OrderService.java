@@ -1,20 +1,20 @@
 package org.java_avanzado.taller.service;
 
 import lombok.RequiredArgsConstructor;
-
+import org.java_avanzado.taller.controller.dto.request.filter.OrderFilterDto;
 import org.java_avanzado.taller.domain.exception.OrderNotFoundException;
 import org.java_avanzado.taller.domain.exception.ProductDisabledError;
 import org.java_avanzado.taller.domain.exception.ProductNotFoundException;
 import org.java_avanzado.taller.domain.model.Order;
 import org.java_avanzado.taller.domain.model.Product;
+import org.java_avanzado.taller.domain.model.enums.OrderStatus;
 import org.java_avanzado.taller.persistence.entity.OrderEntity;
 import org.java_avanzado.taller.persistence.repository.OrderRepository;
+import org.java_avanzado.taller.persistence.specification.OrderSpecifications;
 import org.java_avanzado.taller.utils.mapper.OrderMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.java_avanzado.taller.controller.dto.request.filter.OrderFilterDto;
-import org.java_avanzado.taller.persistence.specification.OrderSpecifications;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -58,7 +58,7 @@ public class OrderService {
      * @param productId the identifier of the product to add
      * @param quantity  the quantity of the product to add
      * @return the updated order
-     * @throws OrderNotFoundException if no order exists with the provided identifier
+     * @throws OrderNotFoundException   if no order exists with the provided identifier
      * @throws ProductNotFoundException if no active product exists with the provided identifier
      */
     @Transactional
@@ -66,7 +66,7 @@ public class OrderService {
         Order order = getOrderById(orderId);
         Product product = productService.getActiveProduct(productId);
 
-        if (product.isActive()){
+        if (product.isActive()) {
             throw new ProductDisabledError("Product is disabled");
         }
 
@@ -85,7 +85,7 @@ public class OrderService {
      * @param orderId   the identifier of the order from which to remove the product
      * @param productId the identifier of the product to remove
      * @return the updated order
-     * @throws OrderNotFoundException if no order exists with the provided identifier
+     * @throws OrderNotFoundException   if no order exists with the provided identifier
      * @throws ProductNotFoundException if no active product exists with the provided identifier
      */
     @Transactional
@@ -93,7 +93,7 @@ public class OrderService {
         Order order = getOrderById(orderId);
         Product product = productService.getActiveProduct(productId);
 
-        if (product.isActive()){
+        if (product.isActive()) {
             throw new ProductDisabledError("Product is disabled");
         }
 
@@ -113,7 +113,7 @@ public class OrderService {
      * @param productId the identifier of the product for which to modify the quantity
      * @param quantity  the new quantity of the product in the order
      * @return the updated order
-     * @throws OrderNotFoundException if no order exists with the provided identifier
+     * @throws OrderNotFoundException   if no order exists with the provided identifier
      * @throws ProductNotFoundException if no active product exists with the provided identifier
      */
     @Transactional
@@ -121,7 +121,7 @@ public class OrderService {
         Order order = getOrderById(orderId);
         Product product = productService.getActiveProduct(productId);
 
-        if (product.isActive()){
+        if (product.isActive()) {
             throw new ProductDisabledError("Product is disabled");
         }
 
@@ -187,6 +187,25 @@ public class OrderService {
     }
 
     /**
+     * Modifies the status of an existing order, allowing for updates such as marking an order as completed,
+     * canceled, or in progress.
+     *
+     * @param orderId     the unique identifier of the order to modify
+     * @param orderStatus the new status to set for the order
+     * @return the updated order with the modified status
+     */
+    @Transactional
+    public Order modifyOrderStatus(Long orderId, OrderStatus orderStatus) {
+        Order order = getOrderById(orderId);
+        order.setOrderStatus(orderStatus);
+        OrderEntity entity = orderRepository.findById(orderId)
+                .orElseThrow(() -> new OrderNotFoundException("Order not found with id: " + orderId));
+        orderMapper.updateEntityFromDomain(order, entity);
+        OrderEntity updatedEntity = orderRepository.save(entity);
+        return orderMapper.fromOrderEntityToDomain(updatedEntity);
+    }
+
+    /**
      * Marks an order as inactive, effectively deleting it from active listings
      * without removing the record from the database.
      *
@@ -201,4 +220,5 @@ public class OrderService {
         order.setActive(false);
         orderRepository.save(order);
     }
+
 }

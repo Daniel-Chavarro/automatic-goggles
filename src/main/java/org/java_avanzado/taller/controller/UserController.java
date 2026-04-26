@@ -10,16 +10,16 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.java_avanzado.taller.controller.dto.request.create.CreateUserRequest;
+import org.java_avanzado.taller.controller.dto.request.filter.UserFilterDto;
 import org.java_avanzado.taller.controller.dto.request.update.UpdateUserRequest;
+import org.java_avanzado.taller.controller.dto.response.PaginatedResponse;
 import org.java_avanzado.taller.controller.dto.response.UserResponse;
 import org.java_avanzado.taller.controller.dto.response.UserSummaryResponse;
-import org.java_avanzado.taller.controller.dto.request.filter.UserFilterDto;
-import org.java_avanzado.taller.controller.dto.response.PaginatedResponse;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.java_avanzado.taller.domain.model.User;
 import org.java_avanzado.taller.service.UserService;
 import org.java_avanzado.taller.utils.mapper.UserMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,7 +30,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
 import java.util.UUID;
 
 @Tag(name = "Users", description = "User management operations")
@@ -42,7 +41,10 @@ public class UserController {
     private final UserService userService;
     private final UserMapper userMapper;
 
-    @Operation(summary = "List all users", description = "Returns a paginated list of users with optional filtering by first name, last name, email, role, and active status.")
+    @Operation(summary = "List all users",
+            description = "Returns a paginated list of users with optional filtering by first name, " +
+                    "last name, email, role, and active status." +
+                    "\nRequires ADMIN role")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Users retrieved successfully"),
             @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
@@ -57,7 +59,9 @@ public class UserController {
         return ResponseEntity.ok(PaginatedResponse.from(responsePage));
     }
 
-    @Operation(summary = "Get user by ID", description = "Returns a single user by their unique identifier.")
+    @Operation(summary = "Get user by ID",
+            description = "Returns a single user by their unique identifier." +
+                    "\nRequires ADMIN role")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "User found"),
             @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
@@ -70,7 +74,9 @@ public class UserController {
         return ResponseEntity.ok(userMapper.fromUserToResponse(userService.getUserById(id)));
     }
 
-    @Operation(summary = "Create a new user", description = "Creates a new user with the provided information. The email must be unique.")
+    @Operation(summary = "Create a new user",
+            description = "Creates a new user with the provided information. The email must be unique." +
+                    "\nRequires ADMIN role")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "User created successfully"),
             @ApiResponse(responseCode = "400", description = "Invalid request data", content = @Content),
@@ -89,7 +95,9 @@ public class UserController {
         return ResponseEntity.ok(userMapper.fromUserToResponse(userService.createUser(user)));
     }
 
-    @Operation(summary = "Update user", description = "Partially updates an existing user. Only provided fields will be updated.")
+    @Operation(summary = "Update user",
+            description = "Partially updates an existing user. Only provided fields will be updated." +
+                    "\nRequires ADMIN role")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "User updated successfully"),
             @ApiResponse(responseCode = "400", description = "Invalid request data", content = @Content),
@@ -109,7 +117,9 @@ public class UserController {
         return ResponseEntity.ok(userMapper.fromUserToResponse(userService.updateUser(id, user)));
     }
 
-    @Operation(summary = "Disable a user", description = "Disables a user account. The user will no longer be able to access the system.")
+    @Operation(summary = "Disable a user",
+            description = "Disables a user account. The user will no longer be able to access the system." +
+                    "\nRequires ADMIN role")
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "User disabled successfully"),
             @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),

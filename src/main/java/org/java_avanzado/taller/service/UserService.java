@@ -1,20 +1,17 @@
 package org.java_avanzado.taller.service;
 
 import lombok.RequiredArgsConstructor;
-import org.java_avanzado.taller.domain.exception.BadCredentialsException;
+import org.java_avanzado.taller.controller.dto.request.filter.UserFilterDto;
 import org.java_avanzado.taller.domain.exception.EmailAlreadyExistsException;
-import org.java_avanzado.taller.domain.exception.InactiveUserException;
 import org.java_avanzado.taller.domain.exception.UserNotFoundException;
 import org.java_avanzado.taller.domain.model.User;
-import org.java_avanzado.taller.domain.model.enums.UserRole;
 import org.java_avanzado.taller.persistence.entity.UserEntity;
 import org.java_avanzado.taller.persistence.repository.UserRepository;
+import org.java_avanzado.taller.persistence.specification.UserSpecifications;
 import org.java_avanzado.taller.utils.mapper.UserMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.java_avanzado.taller.controller.dto.request.filter.UserFilterDto;
-import org.java_avanzado.taller.persistence.specification.UserSpecifications;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,61 +36,6 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
 
-    /**
-     * Registers a new user with the provided credentials.
-     *
-     * @param user the user domain model containing registration data
-     * @return a JWT token for the newly registered user
-     * @throws IllegalArgumentException    if user, email, or password is missing
-     * @throws EmailAlreadyExistsException if the email is already registered
-     */
-    @Deprecated(forRemoval = true)
-    @Transactional
-    public String registerUser(User user) {
-        if (user == null) {
-            throw new IllegalArgumentException("User is required");
-        }
-        if (user.getEmail() == null || user.getEmail().isBlank()) {
-            throw new IllegalArgumentException("Email is required");
-        }
-        if (user.getPassword() == null || user.getPassword().isBlank()) {
-            throw new IllegalArgumentException("Password is required");
-        }
-        if (userRepository.findByEmail(user.getEmail()).isPresent()) {
-            throw new EmailAlreadyExistsException("Email already in use");
-        }
-        UserEntity entity = userMapper.fromUserToEntity(user);
-        entity.setPassword(passwordEncoder.encode(user.getPassword()));
-        entity.setActive(true);
-        if (entity.getRole() == null) {
-            entity.setRole(UserRole.CLIENT);
-        }
-        userRepository.save(entity);
-        return jwtService.generateToken(entity.getEmail());
-    }
-
-    /**
-     * Authenticates a user with email and password.
-     *
-     * @param email    the user's email address
-     * @param password the user's plain-text password
-     * @return a JWT token if authentication succeeds
-     * @throws BadCredentialsException if email not found or password mismatch
-     * @throws InactiveUserException   if the account is disabled
-     */
-    @Transactional(readOnly = true)
-    @Deprecated(forRemoval = true)
-    public String authenticate(String email, String password) {
-        UserEntity user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new BadCredentialsException("Invalid credentials"));
-        if (!passwordEncoder.matches(password, user.getPassword())) {
-            throw new BadCredentialsException("Invalid credentials");
-        }
-        if (!user.isActive()) {
-            throw new InactiveUserException("Account disabled");
-        }
-        return jwtService.generateToken(email);
-    }
 
     /**
      * Retrieves a user by their unique identifier.

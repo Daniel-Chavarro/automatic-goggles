@@ -13,7 +13,6 @@ import org.java_avanzado.taller.persistence.entity.RefreshTokenEntity;
 import org.java_avanzado.taller.persistence.entity.UserEntity;
 import org.java_avanzado.taller.persistence.repository.UserRepository;
 import org.java_avanzado.taller.security.CustomUserDetails;
-import org.java_avanzado.taller.security.CustomUserDetailsService;
 import org.java_avanzado.taller.utils.mapper.UserMapper;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -36,7 +35,7 @@ public class AuthService {
 
     @Transactional
     public JwtAuthResponse register(RegisterUserRequest request) {
-        try{
+        try {
             if (userRepository.findByEmail(request.getEmail()).isPresent()) {
                 throw new EmailAlreadyExistsException("Email already in use");
             }
@@ -59,11 +58,13 @@ public class AuthService {
 
             String refreshToken = refreshTokenService.createRefreshToken(user.getId()).getToken();
 
+            eventLogService.logEvent(EventType.SUCCESSFUL_REGISTER, request.getEmail());
+
             return JwtAuthResponse.builder()
                     .accessToken(accessToken)
                     .refreshToken(refreshToken)
                     .build();
-        } catch (Exception e){
+        } catch (Exception e) {
             eventLogService.logEvent(EventType.FAILED_REGISTER, request.getEmail());
             throw e;
         }
@@ -71,7 +72,7 @@ public class AuthService {
 
     @Transactional
     public JwtAuthResponse login(LoginUserRequest request) {
-        try{
+        try {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
             );
@@ -86,11 +87,13 @@ public class AuthService {
 
             String refreshToken = refreshTokenService.createRefreshToken(user.getId()).getToken();
 
+            eventLogService.logEvent(EventType.SUCCESSFUL_LOGIN, request.getEmail());
+
             return JwtAuthResponse.builder()
                     .accessToken(accessToken)
                     .refreshToken(refreshToken)
                     .build();
-        } catch (Exception e){
+        } catch (Exception e) {
             eventLogService.logEvent(EventType.FAILED_LOGIN, request.getEmail());
             throw e;
         }
@@ -121,6 +124,7 @@ public class AuthService {
     public void logout(String refreshToken) {
         try {
             refreshTokenService.deleteByToken(refreshToken);
+            eventLogService.logEvent(EventType.SUCCESSFUL_LOGOUT, "Unknown email");
         } catch (Exception e) {
             eventLogService.logEvent(EventType.FAILED_LOGOUT, "Unknown email");
             throw new IllegalArgumentException("Invalid refresh token");

@@ -7,10 +7,10 @@ import lombok.Getter;
  * Defines authorization roles available for system users.
  */
 @Getter
-@Schema(description = "User roles in the system", 
+@Schema(description = "User roles in the system",
         allowableValues = {"CLIENT", "ADMIN"})
 public enum UserRole {
-    
+
     /**
      * Standard customer role with regular application permissions.
      */

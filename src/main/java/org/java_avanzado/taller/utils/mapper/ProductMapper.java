@@ -37,9 +37,11 @@ public interface ProductMapper {
     // Domain -> Response
     @Mapping(source = "quantity", target = "stock")
     ProductResponse fromProductToResponse(Product product);
+
     ProductSummaryResponse fromProductToSummary(Product product);
 
     // List variants
     List<ProductResponse> fromProductListToResponseList(List<Product> products);
+
     List<ProductSummaryResponse> fromProductListToSummaryList(List<Product> products);
 }
