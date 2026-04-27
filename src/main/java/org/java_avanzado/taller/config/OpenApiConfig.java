@@ -18,7 +18,7 @@ public class OpenApiConfig {
         final String securitySchemeName = "bearerAuth";
         return new OpenAPI()
                 .info(new Info()
-                        .title("Taller API")
+                        .title("API REST TALLER FINAL")
                         .version("1.0.0")
                         .description("REST API for e-commerce platform managing users, products, orders, and audit logs.")
                         .contact(new Contact()
