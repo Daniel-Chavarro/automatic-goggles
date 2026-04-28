@@ -17,6 +17,7 @@ import org.java_avanzado.taller.controller.dto.response.OrderResponse;
 import org.java_avanzado.taller.controller.dto.response.OrderSummaryResponse;
 import org.java_avanzado.taller.controller.dto.response.PaginatedResponse;
 import org.java_avanzado.taller.domain.model.Order;
+import org.java_avanzado.taller.domain.model.OrderProduct;
 import org.java_avanzado.taller.service.OrderService;
 import org.java_avanzado.taller.service.ProductService;
 import org.java_avanzado.taller.utils.mapper.OrderMapper;
@@ -36,6 +37,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.UUID;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.HashSet;
 
 @Tag(name = "Orders", description = "Order management operations")
 @RestController
@@ -61,7 +66,8 @@ public class OrderController {
     public ResponseEntity<OrderResponse> createOrder(
             @Parameter(description = "Unique identifier of the user placing the order", required = true) @PathVariable @Valid UUID userId) {
         Order order = orderService.createOrder(userId);
-        return ResponseEntity.status(HttpStatus.CREATED).body(orderMapper.fromOrderToResponse(order));
+        Map<Long, String> productNameContext = buildProductNameContextFromOrder(order);
+        return ResponseEntity.status(HttpStatus.CREATED).body(orderMapper.fromOrderToResponse(order, productNameContext));
     }
 
     @Operation(summary = "Get user orders",
@@ -138,7 +144,8 @@ public class OrderController {
                     content = @Content(schema = @Schema(implementation = AddOrderItemRequest.class)))
             @Valid @RequestBody AddOrderItemRequest request) {
         Order updatedOrder = orderService.addProductToOrder(orderId, request.getProductId(), request.getQuantity());
-        return ResponseEntity.ok(orderMapper.fromOrderToResponse(updatedOrder));
+        Map<Long, String> productNameContext = buildProductNameContextFromOrder(updatedOrder);
+        return ResponseEntity.ok(orderMapper.fromOrderToResponse(updatedOrder, productNameContext));
     }
 
     @Operation(summary = "Update product quantity in order",
@@ -164,7 +171,8 @@ public class OrderController {
             @Valid @RequestBody UpdateOrderItemRequest request) {
         Order updatedOrder = orderService.modifyQuantityProductInOrder(
                 orderId, request.getProductId(), request.getQuantity());
-        return ResponseEntity.ok(orderMapper.fromOrderToResponse(updatedOrder));
+        Map<Long, String> productNameContext = buildProductNameContextFromOrder(updatedOrder);
+        return ResponseEntity.ok(orderMapper.fromOrderToResponse(updatedOrder, productNameContext));
     }
 
     @Operation(summary = "Update order status",
@@ -187,7 +195,8 @@ public class OrderController {
                     content = @Content(schema = @Schema(implementation = UpdateOrderRequest.class)))
             @Valid @RequestBody UpdateOrderRequest request) {
         Order order = orderService.modifyOrderStatus(id, request.getStatus());
-        return ResponseEntity.ok(orderMapper.fromOrderToResponse(order));
+        Map<Long, String> productNameContext = buildProductNameContextFromOrder(order);
+        return ResponseEntity.ok(orderMapper.fromOrderToResponse(order, productNameContext));
     }
 
     @Operation(summary = "Remove product from order",
@@ -206,7 +215,54 @@ public class OrderController {
     public ResponseEntity<OrderResponse> deleteItemFromOrder(
             @Parameter(description = "Unique identifier of the order", required = true) @PathVariable("order-id") Long orderId,
             @Parameter(description = "Unique identifier of the product to remove", required = true) @PathVariable("product-id") Long productId) {
-        return ResponseEntity.ok(orderMapper.fromOrderToResponse(
-                orderService.removeProductFromOrder(orderId, productId)));
+        Order updated = orderService.removeProductFromOrder(orderId, productId);
+        Map<Long, String> productNameContext = buildProductNameContextFromOrder(updated);
+        return ResponseEntity.ok(orderMapper.fromOrderToResponse(updated, productNameContext));
+    }
+
+    @Operation(summary = "Get order details",
+            description = "Retrieves detailed information about a specific order, including items, quantities, total price, and status." +
+                    "\nRequires ADMIN OR CLIENT role")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Order details retrieved successfully"),
+            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
+            @ApiResponse(responseCode = "403", description = "Forbidden", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Order not found", content = @Content)
+    })
+    @Transactional
+    @GetMapping("/{id}")
+    public ResponseEntity<OrderResponse> getOrderById(
+            @Parameter(description = "Unique identifier of the order", required = true)
+            @PathVariable Long id) {
+        Order order = orderService.getOrderById(id);
+        Map<Long, String> productNameContext = buildProductNameContextFromOrder(order);
+        return ResponseEntity.ok(orderMapper.fromOrderToResponse(order, productNameContext));
+    }
+
+    private Map<Long, String> buildProductNameContextFromOrder(Order order) {
+        Map<Long, String> map = new HashMap<>();
+        if (order == null || order.getOrderProducts() == null) {
+            return map;
+        }
+
+        // Batch fetch product names to avoid N queries
+        Set<Long> ids = new HashSet<>();
+        for (OrderProduct op : order.getOrderProducts()) {
+            Long pid = op.getProductId();
+            if (pid != null) {
+                ids.add(pid);
+            }
+        }
+
+        if (!ids.isEmpty()) {
+            Map<Long, String> names = productService.findNamesByIds(ids);
+            map.putAll(names);
+            // ensure keys present for ids not found
+            for (Long id : ids) {
+                map.putIfAbsent(id, null);
+            }
+        }
+
+        return map;
     }
 }

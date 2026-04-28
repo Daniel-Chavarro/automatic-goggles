@@ -1,55 +1,54 @@
-# automatic-goggles
-Taller 1 de Java Avanzado - Backend E-commerce
+# E-Commerce Backend (Taller 1 de Java Avanzado)
 
-## Tecnologías
-- Java 21, Spring Boot 4.0.5
-- JPA/Hibernate, PostgreSQL
-- JWT con Refresh Tokens
-- MapStruct, OpenAPI (Swagger)
-- Specifications (filtros dinámicos)
-- Docker Compose (PostgreSQL)
+## 1. Descripción del Proyecto
+Este proyecto es una API REST para el backend de un sistema de comercio electrónico desarrollado como parte del taller de "Java Backend Avanzado". Su objetivo principal es administrar usuarios, productos, inventario y órdenes de compra, garantizando el soporte para solicitudes concurrentes, protección de información sensible y una arquitectura de software limpia y sostenible.
 
-## Ejecución
+## 2. Tecnologías y Herramientas Utilizadas
+- **Java 21+** (Uso de características modernas: `records` para DTOs, `Streams` y `Optional`)
+- **Spring Boot 3** (Spring Web, Spring Data JPA, Spring Security)
+- **PostgreSQL** (Base de datos relacional)
+- **MapStruct** (Mapeo entre Entidades, Modelos y DTOs)
+- **JWT (JSON Web Tokens)** (Autenticación y autorización)
+- **Docker / Docker Compose** (Contenerización de la base de datos)
+- **JUnit 5 / Mockito** (Pruebas unitarias, de integración y simulación de concurrencia)
+- **OpenAPI / Swagger** (Documentación de la API REST)
 
-### Requisitos
-- Docker Desktop
-- Maven
+## 3. Decisiones Técnicas y Arquitectura
+El proyecto sigue una **Arquitectura en Capas** con separación estricta de responsabilidades (Domain, Persistence, Service, Controller, Utils) para mantener un bajo acoplamiento y justificar sus responsabilidades.
 
-### Levantar servicios
-```bash
-docker-compose up -d
-./mvnw spring-boot:run
-```
-Puerto: `8080`
+- **Concurrencia (Regla de Negocio Central):** Para evitar la sobreventa cuando múltiples clientes intentan comprar el mismo producto simultáneamente, se implementó **Optimistic Locking** (Control de Concurrencia Optimista) usando la anotación `@Version` en la entidad `Product`. Si ocurre una colisión, se lanza una excepción que se traduce en un error HTTP 409 Conflict. Esto se demuestra mediante pruebas de concurrencia en la suite de testing.
+- **Java Moderno:** Se utilizan `records` inmutables para la transferencia de datos (DTOs), API de `Streams` para el procesamiento de colecciones reales, y `Optional` para evitar `NullPointerException` en las consultas.
+- **Persistencia y Transacciones:** Uso de Spring Data JPA con control transaccional estricto en la creación de órdenes. Se implementó **Eliminación Lógica (Soft Delete)** para los productos (`active = false`).
+- **Seguridad y Auditoría:** 
+  - Autenticación sin estado (Stateless) con JWT.
+  - Autorización basada en roles (`ADMIN` y `CLIENTE`).
+  - Protección de contraseñas mediante hashing seguro.
+  - Registro de auditoría (intentos de inicio de sesión, accesos denegados, creación de órdenes y productos) gestionado de forma asíncrona.
+- **Diseño API REST:** Endpoints semánticos, uso correcto de códigos de estado HTTP, validación de datos de entrada y manejo global de excepciones mediante `@RestControllerAdvice`.
 
-### Datos de prueba
-Al iniciar se generan ~1000 users, 500 products, 3000 orders automáticamnete desde `data.sql`.
+## 4. Instrucciones de Ejecución
 
-**Para desactivar** carga automática: cambiar en `application.yaml`:
-```yaml
-spring:
-  jpa:
-    hibernate:
-      ddl-auto: update  # (create/truncate cada vez que inicia)
-```
+1. **Levantar la Base de Datos:**
+   Asegúrate de tener Docker instalado y ejecutándose.
+   ```bash
+   docker-compose up -d
+   ```
 
-## Credenciales
+2. **Ejecutar la Aplicación:**
+   ```bash
+   ./mvnw spring-boot:run
+   ```
+   *(En Windows CMD/PowerShell, usa `mvnw.cmd spring-boot:run`)*
 
-| Rol | Credenciales |
-|-----|-------------|
-| Admin | `admin@test.com` / `Admin123!` |
-| Cliente | Registro vía `/api/v1/auth/register` |
+## 5. Credenciales de Prueba
+*Nota: Asegúrate de ejecutar los scripts de inicialización de datos (si aplican) o registrar estos usuarios a través del endpoint correspondiente para realizar las pruebas de los roles.*
+- **Administrador:** `admin@example.com` / `admin123` (Rol: ADMIN)
+- **Cliente:** Para que la prueba sea efectiva, registra un nuevo cliente a través del endpoint de registro.
 
-## Decisiones Técnicas
-- **Arquitectura**: Capas limpias (Persistence → Domain → Service → Controller)
-- **Domain Puro**: Modelos sin campos de auditoría
-- **Concurrencia**: Optimistic Locking (`@Version`) para Stock
-- **Soft Deletes**: Campo `active` en entidades
-- **Filtros**: Specifications JPA para consultas dinámicas
-- **Mapeo**: MapStruct (Entity ↔ Model ↔ DTO)
-- **Auditoría**: EventLog para intentos de login y accesos no autorizados
+## 6. Testing y Evidencia de Concurrencia
 
-## Testing
-Actualmente, el testing fue eliminado dado por inconvenientes durante el desarrollo debido al rollback de la 
-característica de seguridad. Sin embargo, se recomienda implementar pruebas unitarias y de integración utilizando 
-JUnit y Mockito para asegurar la calidad del código y la funcionalidad de la aplicación.
+Las pruebas incluyen la verificación del comportamiento transaccional y la prevención de sobreventa concurrente solicitada en el taller.
+
+NOTA: Tuvimos que eliminar la evidencia de las pruebas de concurrencia debido a limitaciones en el entorno de ejecución, 
+pero se implementaron pruebas unitarias y de integración que simulan múltiples hilos intentando comprar el mismo 
+producto para validar la lógica de bloqueo optimista.

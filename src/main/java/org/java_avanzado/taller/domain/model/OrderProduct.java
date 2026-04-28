@@ -24,6 +24,12 @@ public class OrderProduct {
     private Long productId;
 
     /**
+     * Identifier of the parent order to which this line item belongs.
+     */
+    @EqualsAndHashCode.Exclude
+    private Long orderId;
+
+    /**
      * Number of units requested for the product.
      */
     @EqualsAndHashCode.Exclude

@@ -2,8 +2,9 @@ package org.java_avanzado.taller.service;
 
 import lombok.RequiredArgsConstructor;
 import org.java_avanzado.taller.controller.dto.request.filter.OrderFilterDto;
+import org.java_avanzado.taller.exception.OrderDisabledException;
 import org.java_avanzado.taller.exception.OrderNotFoundException;
-import org.java_avanzado.taller.exception.ProductDisabledError;
+import org.java_avanzado.taller.exception.ProductDisabledException;
 import org.java_avanzado.taller.exception.ProductNotFoundException;
 import org.java_avanzado.taller.domain.model.Order;
 import org.java_avanzado.taller.domain.model.OrderProduct;
@@ -13,6 +14,7 @@ import org.java_avanzado.taller.persistence.entity.OrderEntity;
 import org.java_avanzado.taller.persistence.repository.OrderRepository;
 import org.java_avanzado.taller.persistence.specification.OrderSpecifications;
 import org.java_avanzado.taller.utils.mapper.OrderMapper;
+import org.java_avanzado.taller.utils.mapper.ReferenceMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -35,6 +37,7 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final OrderMapper orderMapper;
     private final ProductService productService;
+    private final ReferenceMapper referenceMapper;
 
     /**
      * Creates a new order for the specified user.
@@ -67,15 +70,16 @@ public class OrderService {
         Order order = getOrderById(orderId);
         Product product = productService.getActiveProduct(productId);
 
-        if (product.isActive()) {
-            throw new ProductDisabledError("Product is disabled");
+        if (!product.isActive()) {
+            throw new ProductDisabledException("Order already finished (COMPLETED/CANCELLED)");
         }
 
         order.addProduct(product, quantity);
         productService.updateProduct(productId, product);
         OrderEntity entity = orderRepository.findById(orderId)
                 .orElseThrow(() -> new OrderNotFoundException("Order not found with id: " + orderId));
-        orderMapper.updateEntityFromDomain(order, entity);
+        // update the JPA entity from the domain model, providing ReferenceMapper context
+        orderMapper.updateEntityFromDomain(order, entity, referenceMapper);
         OrderEntity updatedEntity = orderRepository.save(entity);
         return orderMapper.fromOrderEntityToDomain(updatedEntity);
     }
@@ -92,17 +96,22 @@ public class OrderService {
     @Transactional
     public Order removeProductFromOrder(Long orderId, Long productId) {
         Order order = getOrderById(orderId);
+
+        if (!order.isActive()){
+            throw new OrderDisabledException("Order has been disabled");
+        }
+
         Product product = productService.getActiveProduct(productId);
 
-        if (product.isActive()) {
-            throw new ProductDisabledError("Product is disabled");
+        if (!product.isActive()) {
+            throw new ProductDisabledException("Product is disabled");
         }
 
         order.removeProduct(product);
         productService.updateProduct(productId, product);
         OrderEntity entity = orderRepository.findById(orderId)
                 .orElseThrow(() -> new OrderNotFoundException("Order not found with id: " + orderId));
-        orderMapper.updateEntityFromDomain(order, entity);
+        orderMapper.updateEntityFromDomain(order, entity, referenceMapper);
         OrderEntity updatedEntity = orderRepository.save(entity);
         return orderMapper.fromOrderEntityToDomain(updatedEntity);
     }
@@ -120,17 +129,22 @@ public class OrderService {
     @Transactional
     public Order modifyQuantityProductInOrder(Long orderId, Long productId, int quantity) {
         Order order = getOrderById(orderId);
+
+        if (!order.isActive()){
+            throw new OrderDisabledException("Order has been disabled");
+        }
+
         Product product = productService.getActiveProduct(productId);
 
-        if (product.isActive()) {
-            throw new ProductDisabledError("Product is disabled");
+        if (!product.isActive()) {
+            throw new ProductDisabledException("Product is disabled");
         }
 
         order.updateQuantity(product, quantity);
         productService.updateProduct(productId, product);
         OrderEntity entity = orderRepository.findById(orderId)
                 .orElseThrow(() -> new OrderNotFoundException("Order not found with id: " + orderId));
-        orderMapper.updateEntityFromDomain(order, entity);
+        orderMapper.updateEntityFromDomain(order, entity, referenceMapper);
         OrderEntity updatedEntity = orderRepository.save(entity);
         return orderMapper.fromOrderEntityToDomain(updatedEntity);
     }
@@ -198,6 +212,11 @@ public class OrderService {
     @Transactional
     public Order modifyOrderStatus(Long orderId, OrderStatus orderStatus) {
         Order order = getOrderById(orderId);
+
+        if (!order.isActive()) {
+            throw new OrderDisabledException("Order has been disabled");
+        }
+
         List<OrderProduct> productsToRestock = order.modifyOrderStatus(orderStatus);
         
         if (productsToRestock != null && !productsToRestock.isEmpty()) {
@@ -206,7 +225,7 @@ public class OrderService {
         
         OrderEntity entity = orderRepository.findById(orderId)
                 .orElseThrow(() -> new OrderNotFoundException("Order not found with id: " + orderId));
-        orderMapper.updateEntityFromDomain(order, entity);
+        orderMapper.updateEntityFromDomain(order, entity, referenceMapper);
         OrderEntity updatedEntity = orderRepository.save(entity);
         return orderMapper.fromOrderEntityToDomain(updatedEntity);
     }
@@ -214,6 +233,8 @@ public class OrderService {
     /**
      * Marks an order as inactive, effectively deleting it from active listings
      * without removing the record from the database.
+     * <p>
+     * Uses the domain model's delete() method to properly handle product restocking.
      *
      * @param orderId the unique identifier of the order to delete
      * @throws OrderNotFoundException if no order exists with the given ID
@@ -221,10 +242,23 @@ public class OrderService {
      */
     @Transactional
     public void deleteOrder(Long orderId) {
-        OrderEntity order = orderRepository.findById(orderId)
+        Order order = getOrderById(orderId);
+
+        if (!order.isActive()) {
+            throw new OrderDisabledException("Order has been already disabled");
+        }
+
+        List<OrderProduct> productsToRestock = order.delete();
+
+        if (productsToRestock != null && !productsToRestock.isEmpty()) {
+            productService.restockProducts(productsToRestock);
+        }
+
+        // Update the JPA entity from the domain model
+        OrderEntity entity = orderRepository.findById(orderId)
                 .orElseThrow(() -> new OrderNotFoundException("Order not found with id: " + orderId));
-        order.setActive(false);
-        orderRepository.save(order);
+        orderMapper.updateEntityFromDomain(order, entity, referenceMapper);
+        orderRepository.save(entity);
     }
 
 }

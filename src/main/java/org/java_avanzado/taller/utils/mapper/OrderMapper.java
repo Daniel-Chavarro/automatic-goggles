@@ -1,7 +1,5 @@
 package org.java_avanzado.taller.utils.mapper;
 
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
 import org.java_avanzado.taller.controller.dto.response.OrderItemResponse;
 import org.java_avanzado.taller.controller.dto.response.OrderResponse;
 import org.java_avanzado.taller.controller.dto.response.OrderSummaryResponse;
@@ -19,8 +17,6 @@ import org.mapstruct.MappingTarget;
 import org.mapstruct.Named;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -50,9 +46,9 @@ public interface OrderMapper {
     }
 
     @Mapping(source = "userId", target = "user")
-    void updateEntityFromDomain(Order domain, @MappingTarget OrderEntity entity);
+    void updateEntityFromDomain(Order domain, @MappingTarget OrderEntity entity, @Context ReferenceMapper referenceMapper);
 
-    @Mapping(source = "product.id", target = "productId", qualifiedByName = "longToString")
+    @Mapping(source = "product.id", target = "productId")
     OrderProduct fromOrderProductEntityToDomain(OrderProductEntity entity);
 
     @Mapping(target = "order", ignore = true)
@@ -60,44 +56,17 @@ public interface OrderMapper {
     OrderProductEntity fromOrderProductToEntity(OrderProduct domain, @Context ReferenceMapper referenceMapper);
 
     @Mapping(source = "orderStatus", target = "status")
-    @Mapping(target = "items", ignore = true)
-    OrderResponse fromOrderToResponse(Order order);
+    @Mapping(source = "orderProducts", target = "items")
+    OrderResponse fromOrderToResponse(Order order, @Context Map<Long, String> productNameContext);
 
-    @AfterMapping
-    default void populateOrderItems(Order order, @MappingTarget OrderResponse response, @Context EntityManager entityManager) {
-        if (order == null || order.getOrderProducts() == null || order.getOrderProducts().isEmpty()) {
-            return;
-        }
-
-        List<OrderItemResponse> items = new ArrayList<>();
-        for (OrderProduct op : order.getOrderProducts()) {
-            String productName = null;
-            if (op.getProductId() != null) {
-                ProductEntity product = entityManager.getReference(ProductEntity.class, op.getProductId());
-                if (product != null) {
-                    productName = product.getName();
-                }
-            }
-
-            items.add(OrderItemResponse.builder()
-                    .productId(op.getProductId())
-                    .productName(productName)
-                    .quantity(op.getQuantity())
-                    .unitPrice(op.getUnitPrice())
-                    .build());
-        }
-
-        response.setItems(items);
-    }
 
     @Mapping(source = "orderStatus", target = "status")
     OrderSummaryResponse fromOrderToSummary(Order order);
 
-    @Mapping(source = "productId", target = "productId", qualifiedByName = "stringToLong")
     @Mapping(target = "productName", expression = "java(productNameContext.get(item.getProductId()))")
-    OrderItemResponse fromOrderProductToItemResponse(OrderProduct item, @Context Map<String, String> productNameContext);
+    OrderItemResponse fromOrderProductToItemResponse(OrderProduct item, @Context Map<Long, String> productNameContext);
 
-    List<OrderResponse> fromOrderListToResponseList(List<Order> orders, @Context Map<String, String> productNameContext);
+    List<OrderResponse> fromOrderListToResponseList(List<Order> orders, @Context Map<Long, String> productNameContext);
 
     List<OrderSummaryResponse> fromOrderListToSummaryList(List<Order> orders);
 

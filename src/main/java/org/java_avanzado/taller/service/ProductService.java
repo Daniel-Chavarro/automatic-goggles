@@ -23,6 +23,7 @@ import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.java_avanzado.taller.utils.validators.AuxiliaryMethods.modify;
@@ -106,10 +107,6 @@ public class ProductService {
 
         String name = product.getName().strip().toUpperCase();
 
-        if (productRepository.findByName(name).isPresent()) {
-            throw new IllegalArgumentException("Product name already exists");
-        }
-
         modify(name, entity::setName);
         modify(product.getDescription(), entity::setDescription);
         modify(product.getPrice(), entity::setPrice);
@@ -187,5 +184,11 @@ public class ProductService {
             throw new IllegalArgumentException("Product quantity cannot be negative");
         }
 
+    }
+
+    public Map<Long, String> findNamesByIds(Set<Long> ids) {
+        List<ProductEntity> products = productRepository.findAllById(ids);
+        return products.stream()
+                .collect(Collectors.toMap(ProductEntity::getId, ProductEntity::getName));
     }
 }

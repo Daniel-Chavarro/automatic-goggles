@@ -4,10 +4,10 @@ import org.java_avanzado.taller.exception.BadCredentialsException;
 import org.java_avanzado.taller.exception.EmailAlreadyExistsException;
 import org.java_avanzado.taller.exception.InactiveUserException;
 import org.java_avanzado.taller.exception.InsufficientStockException;
-import org.java_avanzado.taller.exception.OrderFinishedExeption;
+import org.java_avanzado.taller.exception.OrderAlreadyFinishedException;
 import org.java_avanzado.taller.exception.OrderNotFoundException;
 import org.java_avanzado.taller.exception.ProductAlreadyInOrderException;
-import org.java_avanzado.taller.exception.ProductDisabledError;
+import org.java_avanzado.taller.exception.ProductDisabledException;
 import org.java_avanzado.taller.exception.ProductNotFoundException;
 import org.java_avanzado.taller.exception.TokenRefreshExpiredException;
 import org.java_avanzado.taller.exception.UserNotFoundException;
@@ -72,8 +72,8 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", ex.getMessage()));
     }
 
-    @ExceptionHandler(OrderFinishedExeption.class)
-    public ResponseEntity<Map<String, String>> handleOrderFinished(OrderFinishedExeption ex) {
+    @ExceptionHandler(OrderAlreadyFinishedException.class)
+    public ResponseEntity<Map<String, String>> handleOrderFinished(OrderAlreadyFinishedException ex) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("error", ex.getMessage()));
     }
 
@@ -82,8 +82,8 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("error", ex.getMessage()));
     }
 
-    @ExceptionHandler(ProductDisabledError.class)
-    public ResponseEntity<Map<String, String>> handleProductDisabled(ProductDisabledError ex) {
+    @ExceptionHandler(ProductDisabledException.class)
+    public ResponseEntity<Map<String, String>> handleProductDisabled(ProductDisabledException ex) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("error", ex.getMessage()));
     }
 

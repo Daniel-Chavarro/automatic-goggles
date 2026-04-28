@@ -60,10 +60,7 @@ public class AuthService {
 
             eventLogService.logEvent(EventType.SUCCESSFUL_REGISTER, request.getEmail());
 
-            return JwtAuthResponse.builder()
-                    .accessToken(accessToken)
-                    .refreshToken(refreshToken)
-                    .build();
+            return new JwtAuthResponse(accessToken, refreshToken, "Bearer");
         } catch (Exception e) {
             eventLogService.logEvent(EventType.FAILED_REGISTER, request.getEmail());
             throw e;
@@ -89,10 +86,7 @@ public class AuthService {
 
             eventLogService.logEvent(EventType.SUCCESSFUL_LOGIN, request.getEmail());
 
-            return JwtAuthResponse.builder()
-                    .accessToken(accessToken)
-                    .refreshToken(refreshToken)
-                    .build();
+            return new JwtAuthResponse(accessToken, refreshToken, "Bearer");
         } catch (Exception e) {
             eventLogService.logEvent(EventType.FAILED_LOGIN, request.getEmail());
             throw e;
@@ -114,10 +108,7 @@ public class AuthService {
         CustomUserDetails userDetails = new CustomUserDetails(domainUser);
         String accessToken = jwtService.generateToken(userDetails);
 
-        return JwtAuthResponse.builder()
-                .accessToken(accessToken)
-                .refreshToken(refreshToken)
-                .build();
+        return new JwtAuthResponse(accessToken, refreshToken, "Bearer");
     }
 
     @Transactional

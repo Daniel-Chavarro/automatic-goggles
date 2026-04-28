@@ -3,7 +3,7 @@ package org.java_avanzado.taller.domain.model;
 import lombok.Builder;
 import lombok.Data;
 import org.java_avanzado.taller.exception.InsufficientStockException;
-import org.java_avanzado.taller.exception.OrderFinishedExeption;
+import org.java_avanzado.taller.exception.OrderAlreadyFinishedException;
 import org.java_avanzado.taller.exception.ProductAlreadyInOrderException;
 import org.java_avanzado.taller.exception.ProductNotFoundException;
 import org.java_avanzado.taller.domain.model.enums.OrderStatus;
@@ -53,7 +53,8 @@ public class Order {
     /**
      * Indicates whether the order is active in the system.
      */
-    private boolean active;
+    @Builder.Default
+    private boolean active = true;
 
     /**
      * Timestamp when the order was created.
@@ -76,7 +77,7 @@ public class Order {
      */
     public void addProduct(Product product, int quantity) {
         if (!orderStatus.equals(OrderStatus.PENDING)) {
-            throw new OrderFinishedExeption("Cannot update order status, order status is " + orderStatus);
+            throw new OrderAlreadyFinishedException("Cannot update order status, order status is " + orderStatus);
         }
 
         if (orderProducts == null) {
@@ -114,7 +115,7 @@ public class Order {
      */
     public void removeProduct(Product product) {
         if (!orderStatus.equals(OrderStatus.PENDING)) {
-            throw new OrderFinishedExeption("Cannot update order status, order status is " + orderStatus);
+            throw new OrderAlreadyFinishedException("Cannot update order status, order status is " + orderStatus);
         }
 
         if (orderProducts == null) {
@@ -125,15 +126,14 @@ public class Order {
             throw new IllegalArgumentException("Product cannot be null");
         }
 
-        OrderProduct orderProduct = OrderProduct.builder()
-                .productId(product.getId())
-                .build();
+        // Find the existing order product
+        OrderProduct productToReStock = getOrderProductInSet(product.getId());
+        orderProducts.remove(productToReStock);
 
-        if (!orderProducts.contains(orderProduct)) {
-            throw new ProductNotFoundException("Product not found in order: " + id);
-        }
+        totalPrice = BigDecimal.valueOf(totalPrice.subtract(productToReStock.getUnitPrice().multiply(
+                BigDecimal.valueOf(productToReStock.getQuantity()))).doubleValue());
 
-        orderProducts.remove(orderProduct);
+        product.deductStock(-1*productToReStock.getQuantity());
     }
 
     /**
@@ -148,7 +148,7 @@ public class Order {
      */
     public void updateQuantity(Product product, int newQuantity) {
         if (!orderStatus.equals(OrderStatus.PENDING)) {
-            throw new OrderFinishedExeption("Cannot update order status, order status is " + orderStatus);
+            throw new OrderAlreadyFinishedException("Cannot update order status, order status is " + orderStatus);
         }
 
         if (orderProducts == null) {
@@ -159,19 +159,7 @@ public class Order {
             throw new IllegalArgumentException("Product or quantity less than 0");
         }
 
-        OrderProduct orderProduct = OrderProduct.builder()
-                .productId(product.getId())
-                .build();
-
-        if (!orderProducts.contains(orderProduct)) {
-            throw new ProductNotFoundException("Product not found in order: " + id);
-        }
-
-        // Find the existing order product
-        OrderProduct existingOrderProduct = orderProducts.stream()
-                .filter(op -> op.getProductId().equals(product.getId()))
-                .findFirst()
-                .orElseThrow(() -> new ProductNotFoundException("Product not found in order: " + id));
+        OrderProduct existingOrderProduct = getOrderProductInSet(product.getId());
 
 
         int quantityDifference = newQuantity - existingOrderProduct.getQuantity();
@@ -185,9 +173,15 @@ public class Order {
         product.deductStock(quantityDifference);
     }
 
+    /**
+     * Modifies the order status to the specified new status, ensuring that the order is currently in a pending state.
+     *
+     * @param newStatus The new order status to be set.
+     * @return A list of OrderProduct instances that need to be restocked if the new status is REJECTED, or null otherwise.
+     */
     public List<OrderProduct> modifyOrderStatus(OrderStatus newStatus) {
         if (!this.orderStatus.equals(OrderStatus.PENDING)) {
-            throw new OrderFinishedExeption("Cannot update order status, order status is " + this.orderStatus);
+            throw new OrderAlreadyFinishedException("Cannot update order status, order status is " + this.orderStatus);
         }
 
         List<OrderProduct> productsToRestock = null;
@@ -198,5 +192,35 @@ public class Order {
 
         this.setOrderStatus(newStatus);
         return productsToRestock;
+    }
+
+    /**
+     * Deletes the order by marking it as inactive, ensuring that the order is currently in a pending state.
+     *
+     * @return A list of OrderProduct instances that need to be restocked when the order is deleted.
+     * @throws OrderAlreadyFinishedException If the order is not in a pending state and cannot be deleted.
+     */
+    public List<OrderProduct> delete() {
+        if (!this.orderStatus.equals(OrderStatus.PENDING)) {
+            throw new OrderAlreadyFinishedException("Cannot delete order, order status is " + this.orderStatus);
+        }
+
+        List<OrderProduct> productsToRestock = new ArrayList<>(orderProducts);
+        setActive(false);
+        return productsToRestock;
+    }
+
+    /**
+     * Helper method to find an OrderProduct in the orderProducts set by productId.
+     *
+     * @param productId The identifier of the product to find in the order.
+     * @return The OrderProduct associated with the given productId.
+     * @throws ProductNotFoundException If no OrderProduct with the specified productId is found
+     */
+    private OrderProduct getOrderProductInSet(Long productId) {
+        return orderProducts.stream()
+                .filter(op -> op.getProductId().equals(productId))
+                .findFirst()
+                .orElseThrow(() -> new ProductNotFoundException("Product not found in order: " + id));
     }
 }

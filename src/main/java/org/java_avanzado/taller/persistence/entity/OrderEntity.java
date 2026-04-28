@@ -3,6 +3,8 @@ package org.java_avanzado.taller.persistence.entity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -53,6 +55,7 @@ public class OrderEntity extends AuditableEntity {
      * Business status of the order in the workflow.
      */
     @Column(name = "order_status", nullable = false)
+    @Enumerated(EnumType.STRING)
     private OrderStatus orderStatus;
 
     /**
