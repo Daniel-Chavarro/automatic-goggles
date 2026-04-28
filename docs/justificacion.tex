@@ -1,0 +1,74 @@
+\documentclass[12pt, a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage{graphicx}
+\usepackage{geometry}
+\geometry{a4paper, margin=2.5cm}
+\usepackage{hyperref}
+
+\title{Documento de Justificación Técnica \\ \Large Taller 1: Java Backend Avanzado}
+\author{Proyecto de E-Commerce}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\section{Estrategia de Concurrencia}
+Para abordar la regla de negocio central que impide la sobreventa de productos al procesar múltiples órdenes simultáneas, se eligió implementar un \textbf{Control de Concurrencia Optimista (Optimistic Locking)}.
+
+\textbf{Justificación:} En el contexto de un sistema de comercio electrónico común, la probabilidad de que dos o más personas intenten modificar el stock del \textit{exactamente el mismo producto} en la misma fracción de segundo es relativamente baja (comparado con otros sistemas de alta contención). Por tanto, un bloqueo pesimista degradaría innecesariamente el rendimiento general del sistema al bloquear filas en la base de datos para lecturas recurrentes. 
+
+Dejamos que las transacciones sucedan de manera normal, pero validamos la modificación mediante un campo de versión (\texttt{@Version}). Si durante el transcurso de una compra, otro usuario se adelanta y completa una orden sobre el mismo ítem, la transacción del segundo usuario lanzará un error (al no coincidir las versiones), cancelando la orden de manera segura y lanzando un código de error HTTP 409 (Conflict). Esto protege la integridad del inventario sin sacrificar la agilidad del sistema.
+
+\section{Estrategia de Autenticación y Seguridad}
+Se implementó un esquema de seguridad \textbf{Stateless basado en JSON Web Tokens (JWT)}, complementado con Control de Acceso Basado en Roles (RBAC).
+
+\textbf{Justificación:} Al ser una API REST moderna, mantener el estado en el servidor (sesiones HTTP) limita la escalabilidad horizontal. JWT permite que el servidor valide la identidad y roles (ej. \texttt{ADMIN} vs \texttt{CLIENTE}) del usuario en cada petición sin necesidad de consultar la base de datos de manera constante para verificar la sesión, validando simplemente la firma y fecha de expiración del token. Además, las contraseñas se protegen utilizando un algoritmo de hash robusto antes de su persistencia.
+
+\section{Arquitectura Elegida}
+La solución se construyó sobre una \textbf{Arquitectura en Capas (Layered Architecture)}.
+
+\textbf{Justificación:} Aunque existen patrones más desacoplados (como la Arquitectura Hexagonal o Clean Architecture), la arquitectura en capas fue la elección óptima para este proyecto por las siguientes razones:
+\begin{itemize}
+    \item \textbf{Curva de aprendizaje y pragmatismo:} A lo largo del curso aún no se había profundizado en la implementación de Arquitectura Hexagonal en Java. Introducirla sin un dominio completo del patrón podría generar código sobre-diseñado o incorrecto.
+    \item \textbf{Carga de trabajo (Single Developer):} Desarrollar un sistema con puertos y adaptadores estrictos implica una gran cantidad de mapeo, interfaces y abstracciones, lo cual es prohibitivo para un desarrollo individual bajo limitaciones de tiempo. Las capas ofrecen una separación de responsabilidades clara y suficiente para la complejidad actual del dominio.
+\end{itemize}
+
+\section{Detalle de las Capas y Paquetes Específicos}
+El proyecto se dividió rigurosamente para garantizar un bajo acoplamiento, reflejado en la siguiente estructura de paquetes dentro de \texttt{src/main/java/org/java\_avanzado/taller}:
+
+\begin{itemize}
+    \item \textbf{\texttt{domain}:} Contiene la lógica y modelos de negocio puros (\texttt{model} y \texttt{enums}). Esta capa desconoce cualquier framework de persistencia o red. 
+    \item \textbf{\texttt{persistence}:} Encargada de la interacción con la base de datos PostgreSQL. Contiene las \texttt{entity} (mapeo JPA), los \texttt{repository} (interfaces de Spring Data JPA) y las \texttt{specification} para consultas dinámicas.
+    \item \textbf{\texttt{service}:} Actúa como orquestador. Aplica las reglas de negocio transaccionales interactuando con los repositorios y modelos de dominio.
+    \item \textbf{\texttt{controller}:} Responsable de la capa HTTP. Contiene los endpoints REST. Sus subpaquetes organizan la entrada/salida:
+    \begin{itemize}
+        \item \texttt{dto}: Objetos de Transferencia de Datos (\textit{Records}) divididos en \texttt{request} (para entrada de datos, creación y filtrado) y \texttt{response} (salida).
+        \item \texttt{advice}: Contiene el \texttt{GlobalExceptionHandler} para capturar errores de manera centralizada y retornar códigos HTTP limpios.
+    \end{itemize}
+    \item \textbf{\texttt{security}:} Configura Spring Security e incluye la implementación del filtro para validación de tokens en el subpaquete \texttt{jwt}.
+    \item \textbf{\texttt{config}:} Archivos de configuración general de la aplicación y Beans administrados (como configuraciones CORS o de base de datos extra).
+    \item \textbf{\texttt{exception}:} Excepciones de dominio personalizadas.
+    \item \textbf{\texttt{utils}:} Herramientas transversales:
+    \begin{itemize}
+        \item \texttt{mapper}: Interfaces de MapStruct para transformar de Entity a Model a DTO, manteniendo las capas limpias y evitando que un DTO llegue al dominio.
+        \item \texttt{validators}: Lógica reutilizable de validación.
+    \end{itemize}
+\end{itemize}
+
+\section{Diagrama de Arquitectura}
+
+% ESPACIO PARA AGREGAR EL DIAGRAMA DE ARQUITECTURA
+\begin{figure}[htbp]
+    \centering
+    % Descomentar y ajustar el nombre de la imagen cuando se exporte
+    % \includegraphics[width=0.8\textwidth]{diagrama-arquitectura.png}
+    
+    \vspace{4cm} % Espacio en blanco mientras no haya imagen
+    
+    \caption{Diagrama de Arquitectura en Capas de la solución planteada}
+    \label{fig:arquitectura}
+\end{figure}
+
+\end{document}

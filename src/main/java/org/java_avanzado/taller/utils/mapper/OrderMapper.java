@@ -1,0 +1,98 @@
+package org.java_avanzado.taller.utils.mapper;
+
+import org.java_avanzado.taller.controller.dto.response.OrderItemResponse;
+import org.java_avanzado.taller.controller.dto.response.OrderResponse;
+import org.java_avanzado.taller.controller.dto.response.OrderSummaryResponse;
+import org.java_avanzado.taller.domain.model.Order;
+import org.java_avanzado.taller.domain.model.OrderProduct;
+import org.java_avanzado.taller.persistence.entity.OrderEntity;
+import org.java_avanzado.taller.persistence.entity.OrderProductEntity;
+import org.java_avanzado.taller.persistence.entity.ProductEntity;
+import org.mapstruct.AfterMapping;
+import org.mapstruct.Context;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingConstants;
+import org.mapstruct.MappingTarget;
+import org.mapstruct.Named;
+import org.mapstruct.NullValuePropertyMappingStrategy;
+
+import java.util.List;
+import java.util.Map;
+
+@Mapper(componentModel = MappingConstants.ComponentModel.SPRING,
+        uses = {ReferenceMapper.class},
+        nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+public interface OrderMapper {
+
+    @Mapping(source = "user.id", target = "userId")
+    @Mapping(source = "orderProducts", target = "orderProducts")
+    Order fromOrderEntityToDomain(OrderEntity entity);
+
+    default OrderEntity fromOrderToEntity(Order domain) {
+        return fromOrderToEntityInternal(domain);
+    }
+
+    @Mapping(source = "userId", target = "user")
+    OrderEntity fromOrderToEntityInternal(Order domain);
+
+    @AfterMapping
+    default void linkOrderProducts(@MappingTarget OrderEntity orderEntity) {
+        if (orderEntity != null && orderEntity.getOrderProducts() != null) {
+            for (OrderProductEntity item : orderEntity.getOrderProducts()) {
+                item.setOrder(orderEntity);
+            }
+        }
+    }
+
+    @Mapping(source = "userId", target = "user")
+    void updateEntityFromDomain(Order domain, @MappingTarget OrderEntity entity, @Context ReferenceMapper referenceMapper);
+
+    @Mapping(source = "product.id", target = "productId")
+    OrderProduct fromOrderProductEntityToDomain(OrderProductEntity entity);
+
+    @Mapping(target = "order", ignore = true)
+    @Mapping(target = "product", expression = "java(referenceMapper.longToProductEntity(domain.getProductId()))")
+    OrderProductEntity fromOrderProductToEntity(OrderProduct domain, @Context ReferenceMapper referenceMapper);
+
+    @Mapping(source = "orderStatus", target = "status")
+    @Mapping(source = "orderProducts", target = "items")
+    OrderResponse fromOrderToResponse(Order order, @Context Map<Long, String> productNameContext);
+
+
+    @Mapping(source = "orderStatus", target = "status")
+    OrderSummaryResponse fromOrderToSummary(Order order);
+
+    @Mapping(target = "productName", expression = "java(productNameContext.get(item.getProductId()))")
+    OrderItemResponse fromOrderProductToItemResponse(OrderProduct item, @Context Map<Long, String> productNameContext);
+
+    List<OrderResponse> fromOrderListToResponseList(List<Order> orders, @Context Map<Long, String> productNameContext);
+
+    List<OrderSummaryResponse> fromOrderListToSummaryList(List<Order> orders);
+
+    @Named("longToString")
+    default String longToString(Long value) {
+        return value == null ? null : String.valueOf(value);
+    }
+
+    @Named("stringToLong")
+    default Long stringToLong(String value) {
+        return value == null ? null : Long.valueOf(value);
+    }
+
+    @Named("stringToProductEntity")
+    default ProductEntity stringToProductEntity(String productId, @Context ReferenceMapper referenceMapper) {
+        if (productId == null) {
+            return null;
+        }
+        return referenceMapper.longToProductEntity(Long.parseLong(productId));
+    }
+
+    @Named("longToProductEntity")
+    default ProductEntity longToProductEntity(Long productId, @Context ReferenceMapper referenceMapper) {
+        if (productId == null) {
+            return null;
+        }
+        return referenceMapper.longToProductEntity(productId);
+    }
+}
