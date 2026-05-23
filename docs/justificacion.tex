@@ -44,7 +44,7 @@ El proyecto se dividió rigurosamente para garantizar un bajo acoplamiento, refl
     \item \textbf{\texttt{service}:} Actúa como orquestador. Aplica las reglas de negocio transaccionales interactuando con los repositorios y modelos de dominio.
     \item \textbf{\texttt{controller}:} Responsable de la capa HTTP. Contiene los endpoints REST. Sus subpaquetes organizan la entrada/salida:
     \begin{itemize}
-        \item \texttt{dto}: Objetos de Transferencia de Datos (\textit{Records}) divididos en \texttt{request} (para entrada de datos, creación y filtrado) y \texttt{response} (salida).
+        \item \texttt{dto}: Objetos de Transferencia de Datos divididos en \texttt{request} (para entrada de datos, creación y filtrado usando @Data y validaciones de Jakarta) y \texttt{response} (salida usando Records).
         \item \texttt{advice}: Contiene el \texttt{GlobalExceptionHandler} para capturar errores de manera centralizada y retornar códigos HTTP limpios.
     \end{itemize}
     \item \textbf{\texttt{security}:} Configura Spring Security e incluye la implementación del filtro para validación de tokens en el subpaquete \texttt{jwt}.
@@ -57,16 +57,47 @@ El proyecto se dividió rigurosamente para garantizar un bajo acoplamiento, refl
     \end{itemize}
 \end{itemize}
 
+\section{Cambios Realizados desde el Último Commit}
+Con base en la revisión del estado Git local (sin nuevos commits sobre \texttt{develop}), se identificaron cambios estructurales y funcionales relevantes en la solución.
+
+\subsection*{1) Reestructuración del repositorio}
+\begin{itemize}
+    \item El proyecto pasó de una estructura monolítica en raíz a un esquema \textbf{multi-módulo Maven} con empaquetado \texttt{pom} en el padre.
+    \item Se incorporaron tres módulos: \texttt{event-contracts}, \texttt{commerce-app} y \texttt{payments-service}.
+    \item Se eliminó la base de código previa ubicada en \texttt{src/main} y \texttt{src/test} de la raíz, trasladando la lógica de negocio a \texttt{commerce-app}.
+\end{itemize}
+
+\subsection*{2) Evolución funcional: de flujo sincrónico a flujo dirigido por eventos}
+\begin{itemize}
+    \item Se centralizó la topología de mensajería en \texttt{event-contracts} mediante \texttt{EventTopology} y contratos de evento versionados (\texttt{PaymentRequestedEvent}, \texttt{PaymentSucceededEvent}, \texttt{PaymentFailedEvent}).
+    \item \texttt{commerce-app} publica solicitudes de pago al completar checkout y consume resultados de pago para actualizar estado de órdenes (aprobación/rechazo y reposición de stock cuando aplica).
+    \item \texttt{payments-service} procesa solicitudes consumiendo eventos de RabbitMQ, simula el resultado y publica respuesta de éxito o fallo.
+    \item Se añadió endpoint de checkout asíncrono (respuesta HTTP 202) con identificador de correlación para trazabilidad de extremo a extremo.
+\end{itemize}
+
+\subsection*{3) Persistencia, idempotencia y pruebas}
+\begin{itemize}
+    \item Se agregaron mecanismos de idempotencia para resultados de pago procesados en \texttt{commerce-app} y para intentos en \texttt{payments-service}.
+    \item Se extendieron pruebas de integración alrededor de la coreografía de pagos y la topología RabbitMQ (incluyendo soporte con Testcontainers).
+    \item Se actualizó la configuración de infraestructura local en \texttt{docker-compose.yml} para ejecutar PostgreSQL y RabbitMQ.
+\end{itemize}
+
+\subsection*{4) Hallazgos de revisión técnica (riesgos actuales)}
+\begin{itemize}
+    \item \textbf{Riesgo crítico de versionado:} los módulos nuevos aparecen aún como archivos no rastreados por Git (\texttt{?? commerce-app/}, \texttt{?? event-contracts/}, \texttt{?? payments-service/}). Si se confirma un commit sin agregarlos, se versionarán principalmente eliminaciones de la implementación anterior y el repositorio quedará inconsistente.
+    \item \textbf{Riesgo operativo menor:} la configuración de \texttt{docker-compose.yml} depende de variables de entorno para credenciales de PostgreSQL; si no están definidas en el entorno local, el arranque puede fallar.
+\end{itemize}
+
 \section{Diagrama de Arquitectura}
 
 % ESPACIO PARA AGREGAR EL DIAGRAMA DE ARQUITECTURA
+
 \begin{figure}[htbp]
     \centering
-    % Descomentar y ajustar el nombre de la imagen cuando se exporte
-    % \includegraphics[width=0.8\textwidth]{diagrama-arquitectura.png}
-    
+    \includegraphics[width=1\linewidth]{image.png}
+
     \vspace{4cm} % Espacio en blanco mientras no haya imagen
-    
+
     \caption{Diagrama de Arquitectura en Capas de la solución planteada}
     \label{fig:arquitectura}
 \end{figure}
