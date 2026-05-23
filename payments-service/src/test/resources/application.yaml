@@ -1,0 +1,14 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:payments-service-test;MODE=PostgreSQL;DATABASE_TO_UPPER=false;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=false
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    open-in-view: false
+
+app:
+  payments:
+    max-success-amount: 100.00

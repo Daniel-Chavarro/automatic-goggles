@@ -1,0 +1,48 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: 
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+  h2:
+    console:
+      enabled: false
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+    dynamic: false
+    publisher-confirm-type: correlated
+    publisher-returns: true
+    template:
+      mandatory: true
+    listener:
+      simple:
+        auto-startup: false
+        default-requeue-rejected: false
+
+app:
+  bootstrap:
+    first-name: "Test"
+    last-name: "Admin"
+    email: "test-admin@example.com"
+    password: "Admin123!"
+    phone: "1234567890"
+
+jwt:
+  secret: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
+  expiration: 36000000
+
+
+springdoc:
+  swagger-ui:
+    oauth2:
+      authorization-url: http://localhost:8080/oauth2/authorize
+      token-url: http://localhost:8080/oauth2/token

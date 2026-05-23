@@ -1,0 +1,8 @@
+2026-05-23 16:46:09.897543-05:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Tabla "payment_attempts" ya existe
+Table "payment_attempts" already exists; SQL statement:
+create table payment_attempts (payment_id uuid not null, amount numeric(19,2) not null, correlation_id uuid not null, created_at timestamp(6) with time zone not null, failure_code varchar(255), failure_reason varchar(255), order_id bigint not null, source_event_id uuid not null, status enum ('FAILED','PENDING','SUCCEEDED') not null, updated_at timestamp(6) with time zone not null, primary key (payment_id)) [42101-240]
+2026-05-23 16:50:07.689290-05:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Tabla "payment_attempts" ya existe
+Table "payment_attempts" already exists; SQL statement:
+create table payment_attempts (payment_id uuid not null, amount numeric(19,2) not null, correlation_id uuid not null, created_at timestamp(6) with time zone not null, failure_code varchar(255), failure_reason varchar(255), order_id bigint not null, source_event_id uuid not null, status enum ('FAILED','PENDING','SUCCEEDED') not null, updated_at timestamp(6) with time zone not null, primary key (payment_id)) [42101-240]
